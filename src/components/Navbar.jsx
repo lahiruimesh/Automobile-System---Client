@@ -9,7 +9,7 @@ export default function Navbar() {
       <div className="container mx-auto flex justify-between items-center px-6 py-3">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold tracking-wide">
-          AutoService
+          Auto<span className="text-yellow-300">Service</span>
         </Link>
 
         {/* Navigation */}
