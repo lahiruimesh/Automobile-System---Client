@@ -2,6 +2,8 @@ import { useState } from "react";
 import { login as loginAPI } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import bgImage from "../assets/loginbg2.png";
+
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -29,48 +31,61 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
-      <form
-        onSubmit={handleSubmit}
-        className="backdrop-blur-md bg-white/80 border border-gray-200 shadow-xl rounded-2xl p-8 w-full max-w-md"
-      >
-        <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800">
-          Login
-        </h2>
+    <div
+      className="flex h-screen"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      {/* Empty left side for illustration */}
+      <div className="hidden lg:flex flex-1"></div>
 
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          onChange={handleChange}
-          className="w-full px-4 py-3 mb-4 rounded-lg bg-gray-100 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-400"
-        />
-
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          onChange={handleChange}
-          className="w-full px-4 py-3 mb-6 rounded-lg bg-gray-100 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-400"
-        />
-
-        <button
-          type="submit"
-          className="w-full py-3 rounded-lg bg-sky-500 text-white font-semibold shadow-lg hover:bg-sky-600 transition"
+      {/* Form on the right */}
+      <div className="flex-col mt-4 justify-center p-24">
+        <form
+          onSubmit={handleSubmit}
+          className="p-4 w-full max-w-md"
         >
-          Login
-        </button>
+          <h2 className="text-3xl font-bold text-center mb-10 text-gray-600">
+            Login
+          </h2>
 
-        <p className="text-sm text-gray-600 mt-4 text-center">
-          Don’t have an account?{" "}
-          <span
-            onClick={() => navigate("/signup")}
-            className="text-sky-600 cursor-pointer hover:underline"
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            onChange={handleChange}
+            className="backdrop-blur-md w-full px-4 py-4 mb-4 rounded-lg border bg-white/10 border-gray-200 shadow-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-400"
+          />
+
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            onChange={handleChange}
+            className="backdrop-blur-md w-full px-4 py-4 mb-8 rounded-lg bg-white/10 border border-gray-200 shadow-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-400"
+          />
+
+          <button
+            type="submit"
+            className="w-full py-3 rounded-lg bg-sky-500 text-white font-semibold shadow-lg hover:bg-sky-600 transition"
           >
-            Signup
-          </span>
-        </p>
-      </form>
+            Login
+          </button>
+
+          <p className="text-sm text-gray-600 mt-4 text-center">
+            Don’t have an account?{" "}
+            <span
+              onClick={() => navigate("/signup")}
+              className="text-sky-600 cursor-pointer hover:underline"
+            >
+              Signup
+            </span>
+          </p>
+        </form>
+      </div>
     </div>
   );
 }

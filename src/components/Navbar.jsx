@@ -14,16 +14,16 @@ export default function Navbar() {
 
         {/* Navigation */}
         <nav className="flex space-x-6">
-          <Link to="/" className="hover:text-yellow-300">
+          <Link to="/" className="hover:underline hover:text-yellow-300">
             Home
           </Link>
-          <Link to="/services" className="hover:text-yellow-300">
+          <Link to="/services" className="hover:underline hover:text-yellow-300">
             Services
           </Link>
-          <Link to="/about" className="hover:text-yellow-300">
+          <Link to="/about" className="hover:underline hover:text-yellow-300">
             About
           </Link>
-          <Link to="/contact" className="hover:text-yellow-300">
+          <Link to="/contact" className="hover:underline hover:text-yellow-300">
             Contact
           </Link>
         </nav>
@@ -49,7 +49,7 @@ export default function Navbar() {
               )}
               <button
                 onClick={logout}
-                className="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition"
+                className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-blue-700 transition"
               >
                 Logout
               </button>
