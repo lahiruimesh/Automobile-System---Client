@@ -427,7 +427,10 @@ export default function EmployeeDashboard() {
                     {/* Actions */}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => openTimeLogForm(assignment)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openTimeLogForm(assignment);
+                        }}
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition font-medium"
                       >
                         <FiPlus />
@@ -435,9 +438,11 @@ export default function EmployeeDashboard() {
                       </button>
                       <select
                         value={assignment.status}
-                        onChange={(e) =>
-                          handleStatusUpdate(assignment.service_id, e.target.value)
-                        }
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleStatusUpdate(assignment.service_id, e.target.value);
+                        }}
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400 text-sm font-medium"
                       >
                         <option value="pending">Pending</option>
