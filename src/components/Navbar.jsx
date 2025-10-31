@@ -1,8 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const location = useLocation();
+
+  // Hide navbar on dashboard pages - they have their own headers
+  const dashboardPages = ['/employee', '/customer', '/admin'];
+  if (dashboardPages.includes(location.pathname)) {
+    return null;
+  }
 
   return (
     <header className="bg-sky-500 text-white shadow-md">
