@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
+import EmployeeProfile from "./pages/EmployeeProfile";
 import AdminDashboard from "./pages/AdminDashboard";
 import PendingApproval from "./pages/PendingApproval";
 import LandingPage from "./pages/LandingPage";
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/customer" element={<CustomerDashboard />} />
           <Route path="/employee" element={<EmployeeDashboard />} />
+          <Route path="/employee/profile" element={<EmployeeProfile />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/pending" element={<PendingApproval />} />
         </Routes>

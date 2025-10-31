@@ -11,11 +11,16 @@ export const AuthProvider = ({ children }) => {
   const login = (data) => {
     setUser(data);
     localStorage.setItem("user", JSON.stringify(data));
+    // Store token separately for API calls
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+    }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   };
 
   return (

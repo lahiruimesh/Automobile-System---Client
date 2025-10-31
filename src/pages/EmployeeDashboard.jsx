@@ -14,6 +14,9 @@ import {
 import TimeLogForm from "../components/TimeLogForm";
 import TimeEntryCard from "../components/TimeEntryCard";
 import TimeReportChart from "../components/TimeReportChart";
+import ServiceDetailsModal from "../components/ServiceDetailsModal";
+import NotificationBell from "../components/NotificationBell";
+import CalendarView from "../components/CalendarView";
 import {
   FiLogOut,
   FiClock,
@@ -23,6 +26,8 @@ import {
   FiRefreshCw,
   FiCheckSquare,
   FiAlertCircle,
+  FiUser,
+  FiCalendar,
 } from "react-icons/fi";
 
 export default function EmployeeDashboard() {
@@ -30,7 +35,7 @@ export default function EmployeeDashboard() {
   const navigate = useNavigate();
 
   // State
-  const [activeTab, setActiveTab] = useState("assignments"); // assignments, timeLogs, reports
+  const [activeTab, setActiveTab] = useState("assignments"); // assignments, timeLogs, reports, calendar
   const [assignments, setAssignments] = useState([]);
   const [timeLogs, setTimeLogs] = useState([]);
   const [weeklyReport, setWeeklyReport] = useState(null);
@@ -40,6 +45,7 @@ export default function EmployeeDashboard() {
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [editingTimeLog, setEditingTimeLog] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
 
   // Fetch data on mount
   useEffect(() => {
@@ -219,13 +225,23 @@ export default function EmployeeDashboard() {
               <h1 className="text-3xl font-bold">Employee Dashboard</h1>
               <p className="text-sky-100 mt-1">Welcome back, {user?.email}</p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition font-medium"
-            >
-              <FiLogOut />
-              Logout
-            </button>
+            <div className="flex items-center gap-3">
+              <NotificationBell />
+              <button
+                onClick={() => navigate('/employee/profile')}
+                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition font-medium"
+              >
+                <FiUser />
+                My Profile
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition font-medium"
+              >
+                <FiLogOut />
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -282,6 +298,17 @@ export default function EmployeeDashboard() {
               <FiBarChart2 size={20} />
               Reports
             </button>
+            <button
+              onClick={() => setActiveTab("calendar")}
+              className={`flex items-center gap-2 px-6 py-4 font-semibold border-b-4 transition ${
+                activeTab === "calendar"
+                  ? "border-sky-500 text-sky-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <FiCalendar size={20} />
+              Calendar
+            </button>
           </div>
         </div>
       </div>
@@ -321,7 +348,8 @@ export default function EmployeeDashboard() {
                 {assignments.map((assignment) => (
                   <div
                     key={assignment.assignment_id}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border border-gray-200"
+                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border border-gray-200 cursor-pointer"
+                    onClick={() => setSelectedServiceId(assignment.service_id)}
                   >
                     {/* Header */}
                     <div className="flex justify-between items-start mb-4">
@@ -483,6 +511,11 @@ export default function EmployeeDashboard() {
             <TimeReportChart weeklyData={weeklyReport} monthlyData={monthlyReport} />
           </div>
         )}
+
+        {/* Calendar Tab */}
+        {activeTab === "calendar" && !loading && (
+          <CalendarView />
+        )}
       </div>
 
       {/* Time Log Form Modal */}
@@ -499,6 +532,14 @@ export default function EmployeeDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Service Details Modal */}
+      {selectedServiceId && (
+        <ServiceDetailsModal
+          serviceId={selectedServiceId}
+          onClose={() => setSelectedServiceId(null)}
+        />
       )}
     </div>
   );
