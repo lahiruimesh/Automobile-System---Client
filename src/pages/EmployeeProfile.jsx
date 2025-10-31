@@ -109,6 +109,40 @@ export default function EmployeeProfile() {
     }
   };
 
+  const handleProfilePictureUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      showNotification('Please select an image file', 'error');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showNotification('Image size should be less than 5MB', 'error');
+      return;
+    }
+
+    try {
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          await updateProfilePicture(reader.result);
+          showNotification('Profile picture updated successfully!', 'success');
+          fetchProfile();
+        } catch (error) {
+          showNotification('Failed to upload profile picture', 'error');
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      showNotification('Failed to upload profile picture', 'error');
+    }
+  };
+
   const handleAddSkill = async () => {
     try {
       await addSkill(skillForm);
@@ -226,12 +260,30 @@ export default function EmployeeProfile() {
               {/* Profile Picture */}
               <div className="text-center mb-6">
                 <div className="relative inline-block">
-                  <div className="w-32 h-32 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-                    {profile?.full_name?.charAt(0) || 'U'}
-                  </div>
-                  <button className="absolute bottom-0 right-0 bg-sky-500 text-white p-2 rounded-full shadow-lg hover:bg-sky-600 transition">
+                  {profile?.profile_picture ? (
+                    <img
+                      src={profile.profile_picture}
+                      alt="Profile"
+                      className="w-32 h-32 rounded-full object-cover shadow-lg border-4 border-white"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
+                      {profile?.full_name?.charAt(0) || 'U'}
+                    </div>
+                  )}
+                  <label
+                    htmlFor="profile-picture-upload"
+                    className="absolute bottom-0 right-0 bg-sky-500 text-white p-2 rounded-full shadow-lg hover:bg-sky-600 transition cursor-pointer"
+                  >
                     <FiCamera size={18} />
-                  </button>
+                    <input
+                      id="profile-picture-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePictureUpload}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
                 <h2 className="mt-4 text-2xl font-bold text-gray-800">{profile?.full_name}</h2>
                 <p className="text-sky-600 font-medium">{profile?.role}</p>
