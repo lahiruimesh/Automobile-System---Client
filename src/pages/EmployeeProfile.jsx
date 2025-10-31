@@ -28,7 +28,7 @@ import {
 } from 'react-icons/fi';
 
 export default function EmployeeProfile() {
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Not used currently
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState(null);
