@@ -28,7 +28,7 @@ const Chatbot = () => {
     if (isOpen && !isChatbotReady) {
       checkChatbotStatus();
     }
-  }, [isOpen]);
+  }, [isOpen, isChatbotReady]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);

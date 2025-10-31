@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 import {
   getMyAssignments,
   getMyTimeLogs,
@@ -11,6 +12,13 @@ import {
   getMonthlyReport,
   updateServiceStatus,
 } from "../api/timeLog";
+import {
+  getUpcomingAppointments,
+  updateAppointmentStatus,
+  getModificationRequests,
+  approveModificationRequest,
+  rejectModificationRequest,
+} from "../api/appointments";
 import TimeLogForm from "../components/TimeLogForm";
 import TimeEntryCard from "../components/TimeEntryCard";
 import TimeReportChart from "../components/TimeReportChart";
@@ -21,8 +29,9 @@ import {
   FiBarChart2,
   FiPlus,
   FiRefreshCw,
-  FiCheckSquare,
   FiAlertCircle,
+  FiCalendar,
+  FiEdit,
 } from "react-icons/fi";
 
 export default function EmployeeDashboard() {
@@ -30,9 +39,11 @@ export default function EmployeeDashboard() {
   const navigate = useNavigate();
 
   // State
-  const [activeTab, setActiveTab] = useState("assignments"); // assignments, timeLogs, reports
+  const [activeTab, setActiveTab] = useState("assignments"); // assignments, timeLogs, reports, appointments, modifications
   const [assignments, setAssignments] = useState([]);
   const [timeLogs, setTimeLogs] = useState([]);
+  const [appointments, setAppointments] = useState([]);
+  const [modificationRequests, setModificationRequests] = useState([]);
   const [weeklyReport, setWeeklyReport] = useState(null);
   const [monthlyReport, setMonthlyReport] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -41,20 +52,14 @@ export default function EmployeeDashboard() {
   const [editingTimeLog, setEditingTimeLog] = useState(null);
   const [notification, setNotification] = useState(null);
 
-  // Fetch data on mount
-  useEffect(() => {
-    fetchAssignments();
-    fetchTimeLogs();
+  // Notification helper
+  const showNotification = useCallback((message, type = "info") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 5000);
   }, []);
 
-  useEffect(() => {
-    if (activeTab === "reports") {
-      fetchReports();
-    }
-  }, [activeTab]);
-
   // API Calls
-  const fetchAssignments = async () => {
+  const fetchAssignments = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getMyAssignments();
@@ -64,9 +69,9 @@ export default function EmployeeDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showNotification]);
 
-  const fetchTimeLogs = async () => {
+  const fetchTimeLogs = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getMyTimeLogs();
@@ -76,9 +81,9 @@ export default function EmployeeDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showNotification]);
 
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
       const weekly = await getWeeklyReport();
@@ -90,7 +95,47 @@ export default function EmployeeDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [showNotification]);
+
+  const fetchAppointments = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await getUpcomingAppointments();
+      setAppointments(response.data.appointments || []);
+    } catch (error) {
+      showNotification("Failed to load appointments", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [showNotification]);
+
+  const fetchModificationRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await getModificationRequests();
+      setModificationRequests(response.data.modifications || []);
+    } catch (error) {
+      showNotification("Failed to load modification requests", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [showNotification]);
+
+  // Fetch data on mount
+  useEffect(() => {
+    fetchAssignments();
+    fetchTimeLogs();
+  }, [fetchAssignments, fetchTimeLogs]);
+
+  useEffect(() => {
+    if (activeTab === "reports") {
+      fetchReports();
+    } else if (activeTab === "appointments") {
+      fetchAppointments();
+    } else if (activeTab === "modifications") {
+      fetchModificationRequests();
+    }
+  }, [activeTab, fetchReports, fetchAppointments, fetchModificationRequests]);
 
   const handleCreateTimeLog = async (formData) => {
     try {
@@ -153,9 +198,54 @@ export default function EmployeeDashboard() {
     }
   };
 
-  const showNotification = (message, type = "info") => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 5000);
+  const handleUpdateStatus = async (appointmentId, newStatus) => {
+    try {
+      await updateAppointmentStatus(appointmentId, newStatus);
+      showNotification(`Appointment ${newStatus}!`, "success");
+      fetchAppointments();
+    } catch (error) {
+      showNotification(
+        error.response?.data?.message || "Failed to update appointment status",
+        "error"
+      );
+    }
+  };
+
+  const handleApproveModification = async (modificationId) => {
+    if (!window.confirm("Are you sure you want to approve this modification request?")) {
+      return;
+    }
+
+    try {
+      await approveModificationRequest(modificationId);
+      showNotification("Modification request approved successfully!", "success");
+      fetchModificationRequests();
+    } catch (error) {
+      showNotification(
+        error.response?.data?.message || "Failed to approve modification request",
+        "error"
+      );
+    }
+  };
+
+  const handleRejectModification = async (modificationId) => {
+    const reason = window.prompt("Please provide a reason for rejection:");
+    
+    if (!reason || !reason.trim()) {
+      showNotification("Rejection reason is required", "error");
+      return;
+    }
+
+    try {
+      await rejectModificationRequest(modificationId, reason);
+      showNotification("Modification request rejected", "success");
+      fetchModificationRequests();
+    } catch (error) {
+      showNotification(
+        error.response?.data?.message || "Failed to reject modification request",
+        "error"
+      );
+    }
   };
 
   const handleLogout = () => {
@@ -281,6 +371,28 @@ export default function EmployeeDashboard() {
             >
               <FiBarChart2 size={20} />
               Reports
+            </button>
+            <button
+              onClick={() => setActiveTab("appointments")}
+              className={`flex items-center gap-2 px-6 py-4 font-semibold border-b-4 transition ${
+                activeTab === "appointments"
+                  ? "border-sky-500 text-sky-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <FiCalendar size={20} />
+              Appointments
+            </button>
+            <button
+              onClick={() => setActiveTab("modifications")}
+              className={`flex items-center gap-2 px-6 py-4 font-semibold border-b-4 transition ${
+                activeTab === "modifications"
+                  ? "border-sky-500 text-sky-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <FiEdit size={20} />
+              Modifications
             </button>
           </div>
         </div>
@@ -481,6 +593,279 @@ export default function EmployeeDashboard() {
             </div>
 
             <TimeReportChart weeklyData={weeklyReport} monthlyData={monthlyReport} />
+          </div>
+        )}
+
+        {/* Appointments Tab */}
+        {activeTab === "appointments" && !loading && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Customer Appointments ({appointments.length})
+              </h2>
+              <button
+                onClick={fetchAppointments}
+                className="flex items-center gap-2 px-4 py-2 bg-sky-100 text-sky-600 rounded-lg hover:bg-sky-200 transition font-medium"
+              >
+                <FiRefreshCw />
+                Refresh
+              </button>
+            </div>
+
+            {appointments.length === 0 ? (
+              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                <FiCalendar className="mx-auto text-gray-300 mb-4" size={64} />
+                <p className="text-gray-500 text-lg mb-4">No appointments scheduled</p>
+                <p className="text-gray-400">Customer appointments will appear here</p>
+              </div>
+            ) : (
+              <div className="grid gap-4">
+                {appointments.map((appointment) => (
+                  <div
+                    key={appointment.id}
+                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-gray-800">
+                          {appointment.service_type.replace(/_/g, " ").toUpperCase()}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Appointment #{appointment.id}
+                        </p>
+                      </div>
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                          appointment.status === "pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : appointment.status === "confirmed"
+                            ? "bg-blue-100 text-blue-700"
+                            : appointment.status === "in_progress"
+                            ? "bg-purple-100 text-purple-700"
+                            : appointment.status === "completed"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {appointment.status.replace(/_/g, " ").toUpperCase()}
+                      </span>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Customer</p>
+                        <p className="font-semibold text-gray-800">
+                          {appointment.customer_name || "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {appointment.customer_email || ""}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Vehicle</p>
+                        <p className="font-semibold text-gray-800">
+                          {appointment.vehicle_make} {appointment.vehicle_model}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {appointment.vehicle_year} • {appointment.vehicle_color || "N/A"}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Date & Time</p>
+                        <p className="font-semibold text-gray-800">
+                          {appointment.slot_date 
+                            ? format(new Date(appointment.slot_date), "EEEE, MMMM d, yyyy")
+                            : "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {appointment.slot_start_time} - {appointment.slot_end_time}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Booked On</p>
+                        <p className="font-semibold text-gray-800">
+                          {appointment.booked_at 
+                            ? format(new Date(appointment.booked_at), "MMM d, yyyy")
+                            : "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {appointment.booked_at 
+                            ? format(new Date(appointment.booked_at), "h:mm a")
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </div>
+
+                    {appointment.notes && (
+                      <div className="mb-4 p-3 bg-gray-50 rounded">
+                        <p className="text-sm text-gray-500 mb-1">Notes</p>
+                        <p className="text-gray-700">{appointment.notes}</p>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 pt-4 border-t">
+                      {appointment.status === "pending" && (
+                        <>
+                          <button
+                            onClick={() =>
+                              handleUpdateStatus(appointment.id, "confirmed")
+                            }
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
+                          >
+                            Confirm
+                          </button>
+                          <button
+                            onClick={() =>
+                              handleUpdateStatus(appointment.id, "cancelled")
+                            }
+                            className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition font-medium"
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      )}
+                      {appointment.status === "confirmed" && (
+                        <button
+                          onClick={() =>
+                            handleUpdateStatus(appointment.id, "in_progress")
+                          }
+                          className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition font-medium"
+                        >
+                          Start Service
+                        </button>
+                      )}
+                      {appointment.status === "in_progress" && (
+                        <button
+                          onClick={() =>
+                            handleUpdateStatus(appointment.id, "completed")
+                          }
+                          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-medium"
+                        >
+                          Mark Complete
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Modifications Tab */}
+        {activeTab === "modifications" && !loading && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Modification Requests ({modificationRequests.length})
+              </h2>
+              <button
+                onClick={fetchModificationRequests}
+                className="flex items-center gap-2 px-4 py-2 text-sky-600 hover:bg-sky-50 rounded-lg transition"
+              >
+                <FiRefreshCw size={18} />
+                Refresh
+              </button>
+            </div>
+
+            {modificationRequests.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-xl shadow">
+                <FiEdit size={64} className="mx-auto text-gray-300 mb-4" />
+                <p className="text-gray-500 text-lg">No pending modification requests</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {modificationRequests.map((request) => (
+                  <div
+                    key={request.id}
+                    className="p-6 bg-white rounded-xl shadow-md border-l-4 border-orange-500"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-800">
+                          Request #{request.id}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Appointment #{request.appointment_id}
+                        </p>
+                      </div>
+                      <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+                        PENDING
+                      </span>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Customer</p>
+                        <p className="font-semibold text-gray-800">
+                          {request.customer_name}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {request.customer_email}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Vehicle</p>
+                        <p className="font-semibold text-gray-800">
+                          {request.vehicle_make} {request.vehicle_model}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {request.vehicle_year}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Current Time</p>
+                        <p className="font-semibold text-gray-800">
+                          {request.old_date &&
+                            format(new Date(request.old_date), "EEEE, MMMM d, yyyy")}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {request.old_start_time} - {request.old_end_time}
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Requested Time</p>
+                        <p className="font-semibold text-green-600">
+                          {request.new_date &&
+                            format(new Date(request.new_date), "EEEE, MMMM d, yyyy")}
+                        </p>
+                        <p className="text-sm text-green-600 font-medium">
+                          {request.new_start_time} - {request.new_end_time}
+                        </p>
+                      </div>
+                    </div>
+
+                    {request.reason && (
+                      <div className="mb-4 p-3 bg-gray-50 rounded">
+                        <p className="text-sm text-gray-500 mb-1">Reason</p>
+                        <p className="text-gray-700">{request.reason}</p>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 pt-4 border-t">
+                      <button
+                        onClick={() => handleApproveModification(request.id)}
+                        className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-medium"
+                      >
+                        ✓ Approve
+                      </button>
+                      <button
+                        onClick={() => handleRejectModification(request.id)}
+                        className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+                      >
+                        ✕ Reject
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
