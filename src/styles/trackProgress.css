@@ -1,7 +1,7 @@
 /* Track Progress Container */
 .track-progress-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #14b8a6 100%);
   padding: 20px;
 }
 
@@ -22,7 +22,7 @@
   border: none;
   border-radius: 12px;
   font-weight: 600;
-  color: #4f46e5;
+  color: #0891b2;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -47,7 +47,7 @@
   border: none;
   border-radius: 12px;
   font-weight: 600;
-  color: #6366f1;
+  color: #0891b2;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -147,14 +147,14 @@
 }
 
 .selector-card:hover {
-  border-color: #6366f1;
+  border-color: #0891b2;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.2);
 }
 
 .selector-card.selected {
-  border-color: #6366f1;
-  background: #f0f9ff;
+  border-color: #0891b2;
+  background: #ecfeff;
 }
 
 .card-header {
@@ -255,7 +255,7 @@
 }
 
 .progress-percentage {
-  color: #6366f1;
+  color: #0891b2;
   font-size: 1.2rem;
 }
 
@@ -304,21 +304,21 @@
 }
 
 .timeline-node.active {
-  background: #6366f1;
+  background: #0891b2;
   color: white;
 }
 
 .timeline-node.current {
-  box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.2);
+  box-shadow: 0 0 0 8px rgba(8, 145, 178, 0.2);
   animation: pulse 2s ease-in-out infinite;
 }
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 0 0 8px rgba(8, 145, 178, 0.2);
   }
   50% {
-    box-shadow: 0 0 0 12px rgba(99, 102, 241, 0.1);
+    box-shadow: 0 0 0 12px rgba(8, 145, 178, 0.1);
   }
 }
 
@@ -348,7 +348,7 @@
 }
 
 .timeline-line.active {
-  background: #6366f1;
+  background: #0891b2;
 }
 
 .timeline-step:last-child .timeline-line {
@@ -416,10 +416,10 @@
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: #e0e7ff;
-  color: #4338ca;
+  background: #cffafe;
+  color: #0e7490;
   border-radius: 12px;
-  border-left: 4px solid #6366f1;
+  border-left: 4px solid #0891b2;
 }
 
 .info-banner.confirmed {
@@ -442,7 +442,7 @@
 /* Button Styles */
 .btn-primary {
   padding: 14px 32px;
-  background: #6366f1;
+  background: #0891b2;
   color: white;
   border: none;
   border-radius: 12px;
@@ -450,13 +450,13 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 6px rgba(8, 145, 178, 0.3);
 }
 
 .btn-primary:hover {
-  background: #4f46e5;
+  background: #0284c7;
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 6px 12px rgba(8, 145, 178, 0.4);
 }
 
 /* Responsive Design */
