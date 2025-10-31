@@ -7,7 +7,9 @@ export default function Navbar() {
 
   // Hide navbar on dashboard pages - they have their own headers
   const dashboardPages = ['/employee', '/customer', '/admin'];
-  if (dashboardPages.includes(location.pathname)) {
+  const isProfilePage = location.pathname.startsWith('/employee/profile');
+  
+  if (dashboardPages.includes(location.pathname) || isProfilePage) {
     return null;
   }
 
