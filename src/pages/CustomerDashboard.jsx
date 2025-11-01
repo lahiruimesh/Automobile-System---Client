@@ -88,7 +88,7 @@ export default function CustomerDashboard() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 min-h-screen bg-gray-50">
+    <div className="max-w-6xl mx-auto p-6 min-h-screen bg-gray-50 mt-20">
       {/* Snackbar for notifications */}
       <Snackbar
         open={snackbar.open}
