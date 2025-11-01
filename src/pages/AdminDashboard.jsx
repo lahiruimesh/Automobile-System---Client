@@ -10,14 +10,23 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (user?.token) {
-      getPendingEmployees(user.token).then((res) => setEmployees(res.data));
+      getPendingEmployees(user.token)
+        .then((res) => setEmployees(res.data))
+        .catch((error) => {
+          console.error('Error fetching pending employees:', error);
+          setEmployees([]);
+        });
     }
   }, [user]);
 
   const approve = async (id) => {
     if (user?.token) {
-      await approveEmployee(id, user.token);
-      setEmployees(employees.filter((e) => e.id !== id));
+      try {
+        await approveEmployee(id, user.token);
+        setEmployees(employees.filter((e) => e.id !== id));
+      } catch (error) {
+        console.error('Error approving employee:', error);
+      }
     }
   };
 
