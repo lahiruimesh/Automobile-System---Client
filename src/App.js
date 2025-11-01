@@ -16,8 +16,6 @@ import TrackProgress from "./pages/TrackProgress";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Chatbot from "./components/Chatbot";
-import ProfileDrawer from "./components/ProfileDrawer";
-
 
 export default function App() {
   return (
@@ -45,20 +43,6 @@ export default function App() {
           <Chatbot />
         </BrowserRouter>
       </SocketProvider>
-      <BrowserRouter>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/customer" element={<CustomerDashboard />} />
-          <Route path="/employee" element={<EmployeeDashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/pending" element={<PendingApproval />} />
-          <Route path="/profile" element={<ProfileDrawer />} />
-        </Routes>
-        <Footer />
-      </BrowserRouter>
     </AuthProvider>
   );
 }
