@@ -28,7 +28,7 @@ const Chatbot = () => {
     if (isOpen && !isChatbotReady) {
       checkChatbotStatus();
     }
-  }, [isOpen]);
+  }, [isOpen, isChatbotReady]);
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
@@ -271,6 +271,7 @@ const Chatbot = () => {
       )}
 
       <style jsx="true">{`
+      <style>{`
         @keyframes slideUp {
           from {
             opacity: 0;

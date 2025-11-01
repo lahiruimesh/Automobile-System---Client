@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
@@ -9,63 +10,75 @@ export default function Navbar() {
     logout();
     navigate("/login");
   };
+  const location = useLocation();
+
+  // Hide navbar on dashboard pages - they have their own headers
+  const dashboardPages = ['/employee', '/customer', '/admin'];
+  const isProfilePage = location.pathname.startsWith('/employee/profile');
+  
+  if (dashboardPages.includes(location.pathname) || isProfilePage) {
+    return null;
+  }
 
   return (
-    <header className="bg-sky-500 text-white shadow-md">
+    // !!! --- CHANGES APPLIED: 'fixed top-0 left-0 w-full z-50' --- !!!
+    <header className="fixed top-0 left-0 w-full z-50 bg-transparent text-gray-900 h-16 shadow-md">
       <div className="container mx-auto flex justify-between items-center px-6 py-3">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold tracking-wide">
-          Auto<span className="text-yellow-300">Service</span>
+          Auto<span className="text-blue-600">Service</span>
         </Link>
 
-        {/* Navigation */}
+        {/* Navigation - Primary Links */}
         <nav className="flex space-x-6">
-          <Link to="/" className="hover:underline hover:text-yellow-300">
+          <Link to="/" className="hover:underline hover:text-blue-600">
             Home
           </Link>
-          <Link to="/services" className="hover:underline hover:text-yellow-300">
+          <Link to="/services" className="hover:underline hover:text-blue-600">
             Services
           </Link>
-          <Link to="/about" className="hover:underline hover:text-yellow-300">
+          <Link to="/about" className="hover:underline hover:text-blue-600">
             About
           </Link>
-          <Link to="/contact" className="hover:underline hover:text-yellow-300">
+          <Link to="/contact" className="hover:underline hover:text-blue-600">
             Contact
           </Link>
         </nav>
 
-        {/* Navigation */}
+        {/* Navigation - Auth Links */}
         <nav className="flex space-x-6">
           {user ? (
             <>
               {user.role === "customer" && (
-                <Link to="/customer" className="hover:text-yellow-300">
+                <Link to="/customer" className="hover:text-blue-600">
                   Dashboard
                 </Link>
               )}
               {user.role === "employee" && user.is_active && (
-                <Link to="/employee" className="hover:text-yellow-300">
+                <Link to="/employee" className="hover:text-blue-600">
                   Dashboard
                 </Link>
               )}
               {user.role === "admin" && (
-                <Link to="/admin" className="hover:text-yellow-300">
+                <Link to="/admin" className="hover:text-blue-600">
                   Admin
                 </Link>
               )}
               <button
                 onClick={handleLogout}
                 className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-blue-700 transition"
+                onClick={logout}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-blue-600 transition border border-blue-600"
               >
                 Logout
               </button>
             </>
           ) : (
             <>
-              <Link to="/login" className="hover:text-yellow-300">
+              <Link to="/login" className="hover:text-blue-600">
                 Login
               </Link>
-              <Link to="/signup" className="hover:text-yellow-300">
+              <Link to="/signup" className="hover:text-blue-600">
                 Signup
               </Link>
             </>
