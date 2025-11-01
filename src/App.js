@@ -9,6 +9,8 @@ import PendingApproval from "./pages/PendingApproval";
 import LandingPage from "./pages/LandingPage";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import ProfileDrawer from "./components/ProfileDrawer";
+
 
 export default function App() {
   return (
@@ -23,6 +25,7 @@ export default function App() {
           <Route path="/employee" element={<EmployeeDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/pending" element={<PendingApproval />} />
+          <Route path="/profile" element={<ProfileDrawer />} />
         </Routes>
         <Footer />
       </BrowserRouter>

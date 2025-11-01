@@ -17,14 +17,17 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await loginAPI(form);
-      login(res.data);
+      console.log(res.data.user);
+      login(res.data.user);
 
-      if (res.data.role === "customer") navigate("/customer");
-      else if (res.data.role === "employee" && res.data.is_active)
+      localStorage.setItem("token", res.data.token); 
+
+      if (res.data.user.role === "customer") navigate("/customer");
+      else if (res.data.user.role === "employee" && res.data.is_active)
         navigate("/employee");
-      else if (res.data.role === "employee" && !res.data.is_active)
+      else if (res.data.user.role === "employee" && !res.data.is_active)
         navigate("/pending");
-      else if (res.data.role === "admin") navigate("/admin");
+      else if (res.data.user.role === "admin") navigate("/admin");
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     }

@@ -5,7 +5,7 @@ import bgImage from "../assets/signupbg.png"; // your background image
 
 export default function Signup() {
   const [form, setForm] = useState({
-    full_name: "",
+    fullName: "",
     email: "",
     password: "",
     phone: "",
@@ -48,7 +48,7 @@ export default function Signup() {
           </h2>
 
           <input
-            name="full_name"
+            name="fullName"
             placeholder="Full Name"
             onChange={handleChange}
             className="backdrop-blur-md w-full px-4 py-4 mb-4 rounded-lg border bg-white/10 border-gray-200 shadow-xl text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-400"
