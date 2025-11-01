@@ -1,8 +1,15 @@
+import { Link, useNavigate } from "react-router-dom";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   const location = useLocation();
 
   // Hide navbar on dashboard pages - they have their own headers
@@ -58,6 +65,8 @@ export default function Navbar() {
                 </Link>
               )}
               <button
+                onClick={handleLogout}
+                className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-blue-700 transition"
                 onClick={logout}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-blue-600 transition border border-blue-600"
               >

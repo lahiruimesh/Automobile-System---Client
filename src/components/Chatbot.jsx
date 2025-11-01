@@ -270,6 +270,7 @@ const Chatbot = () => {
         </div>
       )}
 
+      <style jsx="true">{`
       <style>{`
         @keyframes slideUp {
           from {
