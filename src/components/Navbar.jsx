@@ -57,12 +57,7 @@ export default function Navbar() {
                   Admin
                 </Link>
               )}
-              <button
-                onClick={logout}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-blue-600 transition border border-blue-600"
-              >
-                Logout
-              </button>
+              <ProfileDrawer user={user} logout={logout} />
             </>
           ) : (
             <>
