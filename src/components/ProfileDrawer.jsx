@@ -183,7 +183,7 @@ export default function ProfileDrawer({ logout }) {
   return (
     <>
       <IconButton onClick={handleDrawerOpen}>
-        <UserCircleIcon className="h-8 w-8 text-white" />
+        <UserCircleIcon className="h-8 w-8 text-black " />
       </IconButton>
 
       <Drawer anchor="right" open={open} onClose={handleDrawerClose}>
