@@ -33,20 +33,6 @@ export default function CustomerDashboard() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Welcome, {user?.role.toUpperCase()}!
-        </h2>
-       
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div>
-          <ServiceRequestForm onSuccess={handleRequestSuccess} />
-        </div>
-        <div>
-          <ServiceRequestList refresh={refreshRequests} />
     <div className="min-h-screen bg-gradient-to-br from-sky-50 to-blue-100">
       {/* Header */}
       <div className="bg-gradient-to-r from-sky-500 to-blue-600 text-white py-16">
