@@ -270,7 +270,7 @@ const Chatbot = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style jsx="true">{`
         @keyframes slideUp {
           from {
             opacity: 0;
