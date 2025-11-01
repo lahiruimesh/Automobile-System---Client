@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import ProfileDrawer from "../components/ProfileDrawer";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -17,6 +18,7 @@ export default function Navbar() {
     // !!! --- CHANGES APPLIED: 'fixed top-0 left-0 w-full z-50' --- !!!
     <header className="fixed top-0 left-0 w-full z-50 bg-transparent text-gray-900 h-16 shadow-md">
       <div className="container mx-auto flex justify-between items-center px-6 py-3">
+
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold tracking-wide">
           Auto<span className="text-blue-600">Service</span>
@@ -42,6 +44,7 @@ export default function Navbar() {
         <nav className="flex space-x-6">
           {user ? (
             <>
+              {/* Dashboard Link by Role */}
               {user.role === "customer" && (
                 <Link to="/customer" className="hover:text-blue-600">
                   Dashboard
@@ -75,7 +78,8 @@ export default function Navbar() {
             </>
           )}
         </nav>
-      </div>
+
+        </div>
     </header>
   );
 }
