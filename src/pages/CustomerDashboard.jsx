@@ -6,6 +6,7 @@ import { CircularProgress, Alert, Snackbar } from "@mui/material";
 export default function CustomerDashboard() {
   const { user, logout } = useAuth(); // auth context
   const navigate = useNavigate();
+  const [refreshRequests, setRefreshRequests] = useState(0);
 
   const [activeStatus, setActiveStatus] = useState(null);
   const [serviceHistory, setServiceHistory] = useState([]);
