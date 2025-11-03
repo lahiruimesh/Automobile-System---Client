@@ -69,7 +69,8 @@ const Chatbot = () => {
     try {
       const userStr = localStorage.getItem('user');
       const user = userStr ? JSON.parse(userStr) : null;
-      const token = user?.token;
+      // Token may be stored either inside the user object or as a separate "token" key.
+      const token = (user && user.token) || localStorage.getItem('token');
 
       if (token) {
         await fetch(`${API_BASE_URL}/chatbot/clear`, {
@@ -111,7 +112,8 @@ const Chatbot = () => {
       // Get JWT token from localStorage
       const userStr = localStorage.getItem('user');
       const user = userStr ? JSON.parse(userStr) : null;
-      const token = user?.token;
+      // Support both storage patterns: token inside `user` or separate `token` key
+      const token = (user && user.token) || localStorage.getItem('token');
 
       if (!token) {
         throw new Error('Please login to use the chatbot');
@@ -270,7 +272,7 @@ const Chatbot = () => {
         </div>
       )}
 
-      <style>{`
+      <style jsx="true">{`
         @keyframes slideUp {
           from {
             opacity: 0;
