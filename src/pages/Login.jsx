@@ -24,7 +24,7 @@ export default function Login() {
         navigate("/employee");
       else if (res.data.role === "employee" && !res.data.is_active)
         navigate("/pending");
-      else if (res.data.role === "admin") navigate("/admin");
+      else if (res.data.role === "admin") navigate("/admin/dashboard");
     } catch (err) {
       alert(err.response?.data?.message || "Login failed");
     }
