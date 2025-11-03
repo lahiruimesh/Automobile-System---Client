@@ -108,6 +108,25 @@
   background: linear-gradient(135deg, rgba(14, 165, 233, 0.05) 0%, rgba(14, 165, 233, 0.1) 100%);
 }
 
+.service-icon-container {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  transition: all 0.3s ease;
+}
+
+.service-card:hover .service-icon-container {
+  transform: scale(1.1);
+}
+
+.service-icon-svg {
+  transition: all 0.3s ease;
+}
+
 .service-icon {
   font-size: 2.5rem;
   margin-bottom: 0.5rem;

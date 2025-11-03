@@ -4,6 +4,18 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { format, isToday, isPast } from "date-fns";
 import {
+  FiDroplet,
+  FiDisc,
+  FiAlertOctagon,
+  FiTool,
+  FiSettings,
+  FiWind,
+  FiCheckCircle,
+  FiTruck,
+  FiStar,
+  FiZap,
+} from "react-icons/fi";
+import {
   getAvailableSlots,
   bookAppointment,
   getMyVehicles,
@@ -14,16 +26,16 @@ import { theme } from "../styles/theme";
 import "../styles/appointments.css";
 
 const SERVICE_TYPES = [
-  { value: "oil_change", label: "Oil Change", duration: "1 hour", icon: "🛢️" },
-  { value: "tire_rotation", label: "Tire Rotation", duration: "1 hour", icon: "🔄" },
-  { value: "brake_service", label: "Brake Service", duration: "2 hours", icon: "🛑" },
-  { value: "engine_diagnostic", label: "Engine Diagnostic", duration: "1-2 hours", icon: "🔧" },
-  { value: "transmission", label: "Transmission Service", duration: "2-3 hours", icon: "⚙️" },
-  { value: "ac_service", label: "AC Service", duration: "1 hour", icon: "❄️" },
-  { value: "general_maintenance", label: "General Maintenance", duration: "1-2 hours", icon: "🔍" },
-  { value: "body_work", label: "Body Work", duration: "Varies", icon: "🚗" },
-  { value: "detailing", label: "Detailing", duration: "2-4 hours", icon: "✨" },
-  { value: "custom_modification", label: "Custom Modification", duration: "Varies", icon: "🎨" },
+  { value: "oil_change", label: "Oil Change", duration: "1 hour", icon: FiDroplet, color: "text-amber-600", bg: "bg-amber-50" },
+  { value: "tire_rotation", label: "Tire Rotation", duration: "1 hour", icon: FiDisc, color: "text-gray-700", bg: "bg-gray-100" },
+  { value: "brake_service", label: "Brake Service", duration: "2 hours", icon: FiAlertOctagon, color: "text-red-600", bg: "bg-red-50" },
+  { value: "engine_diagnostic", label: "Engine Diagnostic", duration: "1-2 hours", icon: FiTool, color: "text-blue-600", bg: "bg-blue-50" },
+  { value: "transmission", label: "Transmission Service", duration: "2-3 hours", icon: FiSettings, color: "text-purple-600", bg: "bg-purple-50" },
+  { value: "ac_service", label: "AC Service", duration: "1 hour", icon: FiWind, color: "text-cyan-600", bg: "bg-cyan-50" },
+  { value: "general_maintenance", label: "General Maintenance", duration: "1-2 hours", icon: FiCheckCircle, color: "text-teal-600", bg: "bg-teal-50" },
+  { value: "body_work", label: "Body Work", duration: "Varies", icon: FiTruck, color: "text-orange-600", bg: "bg-orange-50" },
+  { value: "detailing", label: "Detailing", duration: "2-4 hours", icon: FiStar, color: "text-yellow-600", bg: "bg-yellow-50" },
+  { value: "custom_modification", label: "Custom Modification", duration: "Varies", icon: FiZap, color: "text-indigo-600", bg: "bg-indigo-50" },
 ];
 
 export default function AppointmentBooking() {
@@ -174,17 +186,22 @@ export default function AppointmentBooking() {
       </h2>
       
       <div className="service-grid">
-        {SERVICE_TYPES.map((service) => (
-          <div
-            key={service.value}
-            className={`service-card ${selectedService?.value === service.value ? "selected" : ""}`}
-            onClick={() => setSelectedService(service)}
-          >
-            <div className="service-icon">{service.icon}</div>
-            <h3 className="service-title">{service.label}</h3>
-            <p className="service-duration">{service.duration}</p>
-          </div>
-        ))}
+        {SERVICE_TYPES.map((service) => {
+          const IconComponent = service.icon;
+          return (
+            <div
+              key={service.value}
+              className={`service-card ${selectedService?.value === service.value ? "selected" : ""}`}
+              onClick={() => setSelectedService(service)}
+            >
+              <div className={`service-icon-container ${service.bg}`}>
+                <IconComponent className={`service-icon-svg ${service.color}`} size={32} />
+              </div>
+              <h3 className="service-title">{service.label}</h3>
+              <p className="service-duration">{service.duration}</p>
+            </div>
+          );
+        })}
       </div>
 
       <div className="step-actions">
@@ -416,8 +433,12 @@ export default function AppointmentBooking() {
       <div className="confirmation-details">
         <div className="detail-card">
           <h3>Service</h3>
-          <p className="detail-value">
-            {selectedService.icon} {selectedService.label}
+          <p className="detail-value flex items-center gap-2">
+            {React.createElement(selectedService.icon, { 
+              className: selectedService.color, 
+              size: 20 
+            })}
+            {selectedService.label}
           </p>
         </div>
 
