@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { Plus, Edit, Trash2, Users } from "lucide-react";
 import AdminNavbar from "../../components/adminNavbar";
-import { 
+import {
   getAllEmployees,
   addNewEmployee,
   updateEmployee,
   deleteEmployee,
 } from "../../api/timeLog";
 import { toast } from "react-toastify";
-
 
 export default function EmployeeManagement() {
   const [employees, setEmployees] = useState([]);
@@ -31,7 +30,6 @@ export default function EmployeeManagement() {
     employee_certifications: "",
   });
 
- 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -44,7 +42,6 @@ export default function EmployeeManagement() {
 
     fetchEmployees(); // ✅ call once when page loads
   }, []);
-
 
   const handleAddEmployee = async () => {
     try {
@@ -63,11 +60,6 @@ export default function EmployeeManagement() {
         employee_certifications: newEmployee.employee_certifications,
       };
 
-      await addNewEmployee(employeeData);
-
-      toast.success("Employee added successfully");
-      setShowModal(false);
-
       const updatedEmployees = await getAllEmployees();
       setEmployees(updatedEmployees);
 
@@ -85,8 +77,6 @@ export default function EmployeeManagement() {
         emergency_name: "",
         employee_certifications: "",
       });
-
-      
     } catch (error) {
       console.error("Error adding employee:", error);
       toast.error("Error adding employee");
@@ -96,11 +86,11 @@ export default function EmployeeManagement() {
   const handleEditEmployee = async () => {
     try {
       await updateEmployee(selectedEmployee.id, selectedEmployee);
-  
-      // ✅ Refresh employees after successful update
+
+      // Refresh employees after successful update
       const updatedEmployees = await getAllEmployees();
       setEmployees(updatedEmployees);
-  
+
       setShowEditModal(false);
       setSelectedEmployee(null);
       toast.success("Employee updated successfully");
@@ -109,7 +99,6 @@ export default function EmployeeManagement() {
       toast.error("Error editing employee");
     }
   };
-  
 
   const handleDeleteEmployee = async () => {
     try {
@@ -133,29 +122,6 @@ export default function EmployeeManagement() {
           <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
             <Users size={28} /> Employee Management
           </h1>
-          <button
-            onClick={() => {
-              setSelectedEmployee(null);
-              setNewEmployee({
-                full_name: "",
-                email: "",
-                password: "",
-                phone: "",
-                role: "Employee",
-                isActive: true,
-                address: "",
-                profile_picture: "",
-                date_of_birth: "",
-                emergency_contact: "",
-                emergency_name: "",
-                employee_certifications: "",
-              });
-              setShowModal(true);
-            }}
-            className="bg-sky-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-sky-700"
-          >
-            <Plus size={18} /> Add Employee
-          </button>
         </div>
 
         <div className="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
@@ -212,18 +178,6 @@ export default function EmployeeManagement() {
           </table>
         </div>
       </div>
-
-      {/* Add Employee Modal */}
-      {showModal && (
-        <Modal
-          title="Add New Employee"
-          key="addModal"
-          employee={newEmployee}
-          setEmployee={setNewEmployee}
-          onSave={handleAddEmployee}
-          onClose={() => setShowModal(false)}
-        />
-      )}
 
       {/* Edit Employee Modal */}
       {showEditModal && selectedEmployee && (
