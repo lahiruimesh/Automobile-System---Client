@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import { Calendar } from "lucide-react";
 import AdminNavbar from "../../components/adminNavbar";
+import { getAllAppointments } from "../../api/timeLog";
 
 export default function AppointmentManagement() {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    // fetch("/api/admin/appointments").then(res => res.json()).then(setAppointments);
-    setAppointments([
-      { id: 1, customer: "John Doe", date: "2025-11-01", status: "Completed" },
-      { id: 2, customer: "Nina Silva", date: "2025-11-03", status: "Pending" },
-    ]);
+    const fetchAppointments = async () => {
+      try {
+        const data = await getAllAppointments();
+        setAppointments(data);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+      }
+    };
+    fetchAppointments();
   }, []);
 
   return (
@@ -21,25 +26,61 @@ export default function AppointmentManagement() {
           <Calendar size={28} /> Appointment Management
         </h1>
 
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bg-white rounded-xl shadow-md p-6 overflow-x-auto">
           <table className="w-full border-collapse text-left">
             <thead>
               <tr className="bg-sky-100">
-                <th className="p-3">Customer</th>
-                <th className="p-3">Date</th>
+                <th className="p-3">Service ID</th>
+                <th className="p-3">Customer Name</th>
+                <th className="p-3">Phone</th>
+                <th className="p-3">Vehicle No</th>
+                <th className="p-3">Vehicle Model</th>
+                <th className="p-3">Service Type</th>
+                <th className="p-3">Title</th>
                 <th className="p-3">Status</th>
+                <th className="p-3">Estimate Hours</th>
+                <th className="p-3">Total Hours Logged</th>
+                <th className="p-3">Scheduled Date</th>
+                <th className="p-3">Completion Date</th>
+                <th className="p-3">Assigned Employee</th>
               </tr>
             </thead>
             <tbody>
               {appointments.map((a) => (
-                <tr key={a.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3">{a.customer}</td>
-                  <td className="p-3">{a.date}</td>
-                  <td className={`p-3 font-medium ${
-                    a.status === "Completed" ? "text-green-600" : "text-yellow-600"
-                  }`}>
+                <tr key={a.service_id} className="border-b hover:bg-gray-50">
+                  <td className="p-3">{a.service_id}</td>
+                  <td className="p-3">{a.customer_name}</td>
+                  <td className="p-3">{a.customer_phone}</td>
+                  <td className="p-3">{a.vehicle_number}</td>
+                  <td className="p-3">{a.vehicle_model}</td>
+                  <td className="p-3">{a.service_type}</td>
+                  <td className="p-3">{a.title}</td>
+                  <td
+                    className={`p-3 font-medium ${
+                      a.status === "completed"
+                        ? "text-green-600"
+                        : a.status === "pending"
+                        ? "text-yellow-600"
+                        : a.status === "in-progress"
+                        ? "text-blue-600"
+                        : a.status === "cancelled"
+                        ? "text-red-600"
+                        : "text-gray-600"
+                    }`}
+                  >
                     {a.status}
                   </td>
+                  <td className="p-3">{a.estimated_hours}</td>
+                  <td className="p-3">{a.total_hours_logged}</td>
+                  <td className="p-3">
+                    {new Date(a.scheduled_date).toLocaleDateString()}
+                  </td>
+                  <td className="p-3">
+                    {a.completion_date
+                      ? new Date(a.completion_date).toLocaleDateString()
+                      : "Pending"}
+                  </td>
+                  <td className="p-3">{a.employee_name || "Not Assigned"}</td>
                 </tr>
               ))}
             </tbody>

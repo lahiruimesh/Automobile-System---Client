@@ -2,22 +2,30 @@ import { useEffect, useState } from "react";
 import { getPendingEmployees, approveEmployee } from "../../api/auth";
 import { useAuth } from "../../context/AuthContext";
 import AdminNavbar from "../../components/adminNavbar.jsx";
-import { getTotalEmployees, getTotalCustomers, getTotalAppointments, getCompletedServices } from "../../api/timeLog";
-import { Users, Calendar, Wrench, TrendingUp } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import {
+  getTotalEmployees,
+  getTotalCustomers,
+  getTotalAppointments,
+  getCompletedServices,
+  getServiceStatusSummary,
+} from "../../api/timeLog";
+import { Users, Calendar, Wrench, UserCheck } from "lucide-react";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
+const COLORS = ["#22c55e", "#facc15", "#ef4444"];
 
-export default function AdminDashboard({children}) {
+export default function AdminDashboard() {
   const { user } = useAuth();
   const [employees, setEmployees] = useState([]);
-
   const [stats, setStats] = useState({
     totalEmployees: 0,
     totalCustomers: 0,
     totalAppointments: 0,
-    totalServices: 0,
+    completedServices: 0,
   });
-  
+  const [pieData, setPieData] = useState([]);
+
+  // Fetch Summary Stats
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -25,7 +33,7 @@ export default function AdminDashboard({children}) {
         const totalCustomers = await getTotalCustomers();
         const totalAppointments = await getTotalAppointments();
         const completedServices = await getCompletedServices();
-  
+
         setStats({
           totalEmployees: totalEmployees.count || 0,
           totalCustomers: totalCustomers.count || 0,
@@ -36,35 +44,40 @@ export default function AdminDashboard({children}) {
         console.error("Error fetching stats:", error);
       }
     };
-  
     fetchStats();
   }, []);
-  
 
-  const [barData, setBarData] = useState([
-    { name: "Jan", appointments: 20 },
-    { name: "Feb", appointments: 40 },
-    { name: "Mar", appointments: 25 },
-    { name: "Apr", appointments: 50 },
-    { name: "May", appointments: 30 },
-  ]);
-
-  const [pieData, setPieData] = useState([
-    { name: "Completed", value: 33 },
-    { name: "Pending", value: 12 },
-    { name: "Cancelled", value: 5 },
-  ]);
-
-  const COLORS = ["#22c55e", "#facc15", "#ef4444"];
-
-
+  // Fetch Pending Employee Requests
   useEffect(() => {
-    getPendingEmployees(user.token).then((res) => setEmployees(res.data));
+    getPendingEmployees(user.token)
+      .then((res) => setEmployees(res.data))
+      .catch((err) => console.error("Error fetching pending employees:", err));
   }, [user]);
 
-  const approve = async (id) => {
-    await approveEmployee(id, user.token);
-    setEmployees(employees.filter((e) => e.id !== id));
+  // Fetch Service Status Pie Chart Data
+  useEffect(() => {
+    const fetchServiceStatus = async () => {
+      try {
+        const data = await getServiceStatusSummary();
+        setPieData([
+          { name: "Completed", value: data.completed || 0 },
+          { name: "In Progress", value: data.in_progress || 0 },
+          { name: "Cancelled", value: data.cancelled || 0 },
+        ]);
+      } catch (error) {
+        console.error("Error fetching service status summary:", error);
+      }
+    };
+    fetchServiceStatus();
+  }, []);
+
+  const handleApprove = async (id) => {
+    try {
+      await approveEmployee(id, user.token);
+      setEmployees((prev) => prev.filter((e) => e.id !== id));
+    } catch (error) {
+      console.error("Error approving employee:", error);
+    }
   };
 
   return (
@@ -72,7 +85,9 @@ export default function AdminDashboard({children}) {
       <AdminNavbar />
       <div className="pt-20 px-8 pb-10 bg-gray-50 min-h-screen">
         {/* Page Header */}
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">
+          Admin Dashboard
+        </h1>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -102,72 +117,108 @@ export default function AdminDashboard({children}) {
           />
         </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Bar Chart */}
+        {/* Charts and Pending Requests Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Service Status Pie Chart */}
           <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <TrendingUp size={20} /> Monthly Appointments
-            </h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={barData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="appointments" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Pie Chart */}
-          <div className="bg-white rounded-xl shadow-md p-6 lg:col-span-1">
             <h2 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
               <Wrench size={20} /> Service Status Distribution
             </h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name} ${(percent * 100).toFixed(0)}%`
-                  }
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-6">
+              <ResponsiveContainer width={300} height={250}>
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) =>
+                      `${(percent * 100).toFixed(0)}%`
+                    }
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+
+              {/* Legend with counts */}
+              <div className="space-y-3">
+                {pieData.map((entry, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-full"
+                      style={{
+                        backgroundColor: COLORS[index % COLORS.length],
+                      }}
+                    ></div>
+                    <span className="text-gray-700 font-medium">
+                      {entry.name}:{" "}
+                      <span className="text-gray-900 font-bold">
+                        {entry.value}
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Recent Activity (Placeholder) */}
-          <div className="bg-white rounded-xl shadow-md p-6 lg:col-span-1">
-            <h2 className="text-lg font-semibold text-gray-700 mb-4 flex items-center gap-2">
-              <Calendar size={20} /> Recent Activities
-            </h2>
-            <ul className="space-y-3 text-gray-600">
-              <li>✅ Appointment #1023 marked as completed</li>
-              <li>👩‍🔧 New employee “Alex” registered</li>
-              <li>📅 Appointment booked by customer “John Doe”</li>
-              <li>🛠️ Service request updated by technician “Sara”</li>
-            </ul>
+          {/* Pending Employee Requests */}
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
+                <Users size={20} /> Pending Employee Requests
+              </h2>
+            </div>
+            {employees.length === 0 ? (
+              <p className="text-gray-500 text-sm">No pending requests.</p>
+            ) : (
+              <ul className="space-y-4">
+                {employees.map((emp) => (
+                  <li
+                    key={emp.id}
+                    className="flex items-center justify-between border-b pb-2"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-800">
+                        {emp.firstName} {emp.lastName}
+                      </p>
+                      <p className="text-sm text-gray-500">{emp.email}</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleApprove(emp.id)}
+                        className="flex items-center gap-1 bg-green-500 text-white px-3 py-1 rounded-md text-sm hover:bg-green-600"
+                      >
+                        <UserCheck size={16} /> Approve
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
       </div>
     </>
-    );
+  );
 }
 
+// DashboardCard Component
 function DashboardCard({ title, value, icon, color }) {
   return (
-    <div className={`flex items-center justify-between ${color} text-white p-5 rounded-xl shadow-md`}>
+    <div
+      className={`flex items-center justify-between ${color} text-white p-5 rounded-xl shadow-md`}
+    >
       <div>
         <p className="text-sm font-medium">{title}</p>
         <h3 className="text-3xl font-bold">{value}</h3>
