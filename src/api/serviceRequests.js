@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -36,5 +36,11 @@ export const updateRequestStatus = async (requestId, statusData) => {
 // Get all requests (admin only)
 export const getAllRequests = async () => {
   const response = await api.get("/api/admin/requests");
+  return response.data;
+};
+
+// Get request history (status history / progress history)
+export const getRequestHistory = async (requestId) => {
+  const response = await api.get(`/api/requests/${requestId}/history`);
   return response.data;
 };

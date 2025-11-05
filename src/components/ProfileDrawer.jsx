@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Drawer,
   IconButton,
@@ -16,6 +17,7 @@ import {
 import { UserCircleIcon } from "@heroicons/react/24/solid";
 
 export default function ProfileDrawer({ logout }) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -62,7 +64,7 @@ export default function ProfileDrawer({ logout }) {
 
       setProfileLoading(true);
 
-      const response = await fetch("http://localhost:5000/api/auth/profile", {
+      const response = await fetch("http://localhost:5001/api/auth/profile", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -107,7 +109,7 @@ export default function ProfileDrawer({ logout }) {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/auth/profile", {
+      const response = await fetch("http://localhost:5001/api/auth/profile", {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -144,7 +146,7 @@ export default function ProfileDrawer({ logout }) {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/auth/change-password", {
+      const response = await fetch("http://localhost:5001/api/auth/change-password", {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -179,6 +181,11 @@ export default function ProfileDrawer({ logout }) {
 
   const showSnackbar = (message, severity = "success") => setSnackbar({ open: true, message, severity });
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <>
@@ -261,7 +268,7 @@ export default function ProfileDrawer({ logout }) {
           )}
 
           <Divider sx={{ my: 2 }} />
-          <Button variant="outlined" color="error" onClick={logout} fullWidth>Logout</Button>
+          <Button variant="outlined" color="error" onClick={handleLogout} fullWidth>Logout</Button>
         </Box>
       </Drawer>
     </>

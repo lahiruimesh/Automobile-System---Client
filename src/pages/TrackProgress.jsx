@@ -160,7 +160,7 @@ export default function TrackProgress() {
 
   if (loading) {
     return (
-      <div className="track-progress-container">
+      <div className="track-progress-container pt-16">
         <div className="loading-spinner">
           <FiRefreshCw className="spin" size={48} />
           <p>Loading your appointments...</p>
@@ -171,7 +171,7 @@ export default function TrackProgress() {
 
   if (appointments.length === 0) {
     return (
-      <div className="track-progress-container">
+      <div className="track-progress-container pt-16">
         <div className="empty-state">
           <FiAlertCircle size={64} className="empty-icon" />
           <h2>No Active Appointments</h2>
@@ -188,7 +188,7 @@ export default function TrackProgress() {
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="track-progress-container">
+    <div className="track-progress-container pt-16">
       {/* Header */}
       <div className="track-header">
         <button className="back-button" onClick={() => navigate("/customer-dashboard")}>

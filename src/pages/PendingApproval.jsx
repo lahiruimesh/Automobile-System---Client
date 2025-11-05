@@ -11,7 +11,7 @@ export default function PendingApproval() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: "20px", paddingTop: "5rem" }}>
       <h2>Your account is pending approval</h2>
       <p>Please wait until the Super Admin approves your account.</p>
       <button onClick={handleLogout}>Logout</button>

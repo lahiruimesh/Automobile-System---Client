@@ -496,7 +496,7 @@ export default function AppointmentBooking() {
   );
 
   return (
-    <div className="appointment-booking-page">
+    <div className="appointment-booking-page pt-16">
       <div className="booking-container">
         {/* Progress Indicator */}
         <div className="progress-indicator">
