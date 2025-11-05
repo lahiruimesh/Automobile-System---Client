@@ -15,9 +15,21 @@ export default function AdminNavbar() {
 
   const menuItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <Home size={18} /> },
-    { name: "Employees", path: "/admin/employee-management", icon: <Users size={18} /> },
-    { name: "Customers", path: "/admin/customers", icon: <UserCircle size={18} /> },
-    { name: "Appointments", path: "/admin/appointments", icon: <Calendar size={18} /> },
+    {
+      name: "Employees",
+      path: "/admin/employee-management",
+      icon: <Users size={18} />,
+    },
+    {
+      name: "Customers",
+      path: "/admin/customers",
+      icon: <UserCircle size={18} />,
+    },
+    {
+      name: "Appointments",
+      path: "/admin/appointments",
+      icon: <Calendar size={18} />,
+    },
     { name: "Reports", path: "/admin/reports", icon: <BarChart2 size={18} /> },
   ];
 
@@ -25,7 +37,10 @@ export default function AdminNavbar() {
     <header className="bg-sky-600 text-white shadow-md fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto flex justify-between items-center px-6 py-3">
         {/* Logo */}
-        <Link to="/admin/dashboard" className="text-2xl font-bold tracking-wide">
+        <Link
+          to="/admin/dashboard"
+          className="text-2xl font-bold tracking-wide"
+        >
           Auto<span className="text-yellow-300">Service</span>
           <span className="text-sm font-normal ml-1">Admin</span>
         </Link>
