@@ -54,21 +54,10 @@ function AppContent() {
         <Route path="/appointments/my-appointments" element={<MyAppointments />} />
         <Route path="/appointments/track-progress" element={<TrackProgress />} />
       </Routes>
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
-      <Footer />
-=======
-=======
->>>>>>> Stashed changes
       
       {/* Hide Footer on admin routes */}
       {!isAdminRoute && <Footer />}
       
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
       <Chatbot />
       <ToastContainer position="top-right" autoClose={3000} />
     </>
