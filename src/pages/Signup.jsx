@@ -30,7 +30,7 @@ export default function Signup() {
 
   return (
     <div
-      className="flex min-h-screen"
+      className="flex min-h-screen pt-16"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",

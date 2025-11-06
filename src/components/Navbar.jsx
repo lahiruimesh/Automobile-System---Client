@@ -22,8 +22,8 @@ export default function Navbar() {
   }
 
   return (
-    // !!! --- CHANGES APPLIED: 'fixed top-0 left-0 w-full z-50' --- !!!
-    <header className="fixed top-0 left-0 w-full z-50 bg-transparent text-gray-900 h-16 shadow-md">
+    // Fixed navbar with white background to prevent overlap issues
+    <header className="fixed top-0 left-0 w-full z-50 bg-white text-gray-900 h-16 shadow-md">
       <div className="container mx-auto flex justify-between items-center px-6 py-3">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold tracking-wide">

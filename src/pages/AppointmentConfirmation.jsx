@@ -23,7 +23,7 @@ export default function AppointmentConfirmation() {
   }
 
   return (
-    <div className="appointment-booking-page">
+    <div className="appointment-booking-page pt-16">
       <div className="booking-container">
         <div className="confirmation-success">
           <div className="success-icon">✅</div>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getServiceDetails } from '../api/employeeApi';
+import { useSocket } from '../context/SocketContext';
+import { getRequestHistory } from '../api/serviceRequests';
 import {
   FiX,
   FiUser,
@@ -28,12 +30,61 @@ export default function ServiceDetailsModal({ serviceId, onClose }) {
   const [timeLogs, setTimeLogs] = useState([]);
   const [progress, setProgress] = useState({ total: 0, completed: 0, percentage: 0 });
   const [activeTab, setActiveTab] = useState('overview'); // overview, tasks, photos, notes, parts, history
+  const [requestHistory, setRequestHistory] = useState([]);
+  const { socket } = useSocket();
 
   useEffect(() => {
     if (serviceId) {
       fetchServiceDetails();
     }
   }, [serviceId]);
+
+  // Fetch history when history tab is active or when serviceId changes while on history
+  useEffect(() => {
+    if (activeTab === 'history' && serviceId) {
+      fetchHistory();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, serviceId]);
+
+  // Socket: listen for updates to this service and update UI
+  useEffect(() => {
+    if (!socket || !serviceId) return;
+
+    const handleUpdate = (payload) => {
+      const { requestId, status, progress: newProgress, note, updatedAt } = payload;
+      if (String(requestId) !== String(serviceId)) return;
+
+      // Update local service state
+      setService((s) => ({
+        ...s,
+        status: status ?? s.status,
+        progress: typeof newProgress === 'number' ? newProgress : s.progress,
+        updated_at: updatedAt ?? s.updated_at,
+      }));
+
+      // Update progress UI
+      setProgress((p) => ({
+        ...p,
+        percentage: typeof newProgress === 'number' ? newProgress : p.percentage,
+      }));
+
+      // Optionally prepend to history if open
+      setRequestHistory((prev) => {
+        const entry = {
+          id: Date.now(),
+          status: status,
+          progress: newProgress,
+          note: note,
+          created_at: updatedAt || new Date().toISOString(),
+        };
+        return [entry, ...prev];
+      });
+    };
+
+    socket.on('serviceRequestStatusUpdate', handleUpdate);
+    return () => socket.off('serviceRequestStatusUpdate', handleUpdate);
+  }, [socket, serviceId]);
 
   const fetchServiceDetails = async () => {
     try {
@@ -52,6 +103,18 @@ export default function ServiceDetailsModal({ serviceId, onClose }) {
       console.error('Error fetching service details:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchHistory = async () => {
+    try {
+      const res = await getRequestHistory(serviceId);
+      // normalize response: accept {data: [...] } or [...]
+      const hist = res && Array.isArray(res) ? res : (res.data || res.history || []);
+      setRequestHistory(hist);
+    } catch (error) {
+      console.error('Error fetching request history:', error);
+      setRequestHistory([]);
     }
   };
 
@@ -427,36 +490,43 @@ export default function ServiceDetailsModal({ serviceId, onClose }) {
           {/* History Tab */}
           {activeTab === 'history' && (
             <div className="space-y-3">
-              {timeLogs.length === 0 ? (
+              {(requestHistory.length === 0 && timeLogs.length === 0) ? (
                 <div className="text-center py-12 text-gray-500">
                   <FiClock size={48} className="mx-auto mb-3 text-gray-300" />
-                  <p>No time logs yet</p>
+                  <p>No history available</p>
                 </div>
               ) : (
-                timeLogs.map((log) => (
-                  <div key={log.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                // prefer requestHistory (status/progress history) if available, otherwise fall back to timeLogs
+                (requestHistory.length > 0 ? requestHistory : timeLogs).map((entry) => (
+                  <div key={entry.id || entry._id || entry.created_at} className="bg-white border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="font-semibold text-gray-800">{log.employee_name}</span>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(log.status)}`}>
-                            {log.status}
+                          <span className="font-semibold text-gray-800">{entry.employee_name || entry.author_name || entry.updated_by_name || 'System'}</span>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(entry.status || entry.state || entry.log_status)}`}>
+                            {entry.status || entry.state || entry.log_status || entry.note_type || 'update'}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-700 mb-2">{log.work_description}</p>
+                        <p className="text-sm text-gray-700 mb-2">{entry.note || entry.work_description || entry.message || entry.note_text || ''}</p>
                         <div className="flex items-center gap-4 text-xs text-gray-600">
                           <span className="flex items-center gap-1">
                             <FiCalendar size={12} />
-                            {new Date(log.log_date).toLocaleDateString()}
+                            {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : (entry.log_date ? new Date(entry.log_date).toLocaleDateString() : '')}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <FiClock size={12} />
-                            {log.start_time} - {log.end_time}
-                          </span>
+                          {entry.start_time && (
+                            <span className="flex items-center gap-1">
+                              <FiClock size={12} />
+                              {entry.start_time} - {entry.end_time}
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-sky-600">{log.hours_worked}h</p>
+                        {typeof entry.hours_worked !== 'undefined' ? (
+                          <p className="text-2xl font-bold text-sky-600">{entry.hours_worked}h</p>
+                        ) : entry.progress !== undefined ? (
+                          <p className="text-2xl font-bold text-sky-600">{entry.progress}%</p>
+                        ) : null}
                       </div>
                     </div>
                   </div>

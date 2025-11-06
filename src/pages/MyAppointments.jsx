@@ -196,7 +196,7 @@ export default function MyAppointments() {
 
   if (loading) {
     return (
-      <div className="appointment-booking-page">
+      <div className="appointment-booking-page pt-16">
         <div className="booking-container">
           <div className="loading-spinner">Loading your appointments...</div>
         </div>
@@ -205,7 +205,7 @@ export default function MyAppointments() {
   }
 
   return (
-    <div className="appointment-booking-page">
+    <div className="appointment-booking-page pt-16">
       <div className="booking-container">
         <div className="appointments-header">
           <h1 className="page-title">My Appointments</h1>

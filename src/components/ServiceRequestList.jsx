@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSocket } from "../context/SocketContext";
 import { getUserRequests } from "../api/serviceRequests";
 
 export default function ServiceRequestList({ refresh }) {
@@ -32,6 +33,37 @@ export default function ServiceRequestList({ refresh }) {
   useEffect(() => {
     fetchRequests();
   }, [refresh]);
+
+  // Listen for real-time updates for service requests
+  const { socket } = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdate = (payload) => {
+      const { requestId, status, progress, note, updatedAt } = payload;
+      setRequests((prev) =>
+        prev.map((r) => {
+          const rid = r.id || r._id || r.request_id || r.requestId;
+          if (String(rid) === String(requestId)) {
+            return {
+              ...r,
+              status: status ?? r.status,
+              progress: typeof progress === 'number' ? progress : r.progress,
+              last_note: note ?? r.last_note,
+              updated_at: updatedAt ?? r.updated_at,
+            };
+          }
+          return r;
+        })
+      );
+    };
+
+    socket.on("serviceRequestStatusUpdate", handleUpdate);
+    return () => {
+      socket.off("serviceRequestStatusUpdate", handleUpdate);
+    };
+  }, [socket]);
 
   const getStatusColor = (status) => {
     switch (status) {
