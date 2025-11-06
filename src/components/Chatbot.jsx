@@ -13,7 +13,7 @@ const Chatbot = () => {
   const messagesEndRef = useRef(null);
 
   // API Base URL - Update this to match your backend URL
-  const API_BASE_URL = 'http://localhost:5001';
+  const API_BASE_URL = 'http://localhost:5000';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

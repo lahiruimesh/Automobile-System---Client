@@ -6,18 +6,27 @@ import ProfileDrawer from "../components/ProfileDrawer";
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
-  const location = useLocation();
 
-  // Hide navbar on dashboard pages - they have their own headers
-  const dashboardPages = [];
+  // Hide navbar on dashboard pages and other authenticated pages
+  const hiddenPages = [
+    '/customer',
+    '/employee',
+    '/admin',
+    '/pending',
+    '/appointments/book',
+    '/appointments/confirmation',
+    '/appointments/my-appointments',
+    '/appointments/track-progress'
+  ];
   const isProfilePage = location.pathname.startsWith('/employee/profile');
   
-  if (dashboardPages.includes(location.pathname) || isProfilePage) {
+  if (hiddenPages.includes(location.pathname) || isProfilePage) {
     return null;
   }
 

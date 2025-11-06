@@ -63,7 +63,7 @@ export default function CustomerDashboard() {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/login");
   };
 
   return (
