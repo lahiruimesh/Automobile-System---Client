@@ -9,7 +9,6 @@ import Signup from "./pages/Signup";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import EmployeeProfile from "./pages/EmployeeProfile";
-import AdminDashboard from "./pages/AdminDashboard";
 import AdminDashboard from "./pages/Admin Pages/AdminDashboard";
 import PendingApproval from "./pages/PendingApproval";
 import LandingPage from "./pages/LandingPage";
