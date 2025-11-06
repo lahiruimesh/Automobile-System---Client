@@ -64,7 +64,7 @@ export default function ProfileDrawer({ logout }) {
 
       setProfileLoading(true);
 
-      const response = await fetch("http://localhost:5001/api/auth/profile", {
+      const response = await fetch("http://localhost:5000/api/auth/profile", {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -109,7 +109,7 @@ export default function ProfileDrawer({ logout }) {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5001/api/auth/profile", {
+      const response = await fetch("http://localhost:5000/api/auth/profile", {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -146,7 +146,7 @@ export default function ProfileDrawer({ logout }) {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5001/api/auth/change-password", {
+      const response = await fetch("http://localhost:5000/api/auth/change-password", {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
