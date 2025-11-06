@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { UserCircle } from "lucide-react";
-import { Modal, Button, Spin } from "antd";
+import { UserCircle, X } from "lucide-react";
 import AdminNavbar from "../../components/adminNavbar";
 import {
   getAllCustomers,
@@ -74,7 +73,7 @@ export default function CustomerList() {
         <div className="bg-white rounded-xl shadow-md p-6">
           {loading ? (
             <div className="flex justify-center items-center py-10">
-              <Spin size="large" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
             </div>
           ) : (
             <table className="w-full border-collapse text-left">
@@ -99,16 +98,18 @@ export default function CustomerList() {
                       {new Date(c.registered_date).toLocaleDateString()}
                     </td>
                     <td className="p-3 text-center space-x-2">
-                      <Button
-                        type="primary"
-                        size="small"
+                      <button
+                        className="bg-sky-600 text-white px-3 py-1 rounded hover:bg-sky-700 text-sm"
                         onClick={() => openVehicleModal(c)}
                       >
                         View Vehicles
-                      </Button>
-                      <Button size="small" onClick={() => openServiceModal(c)}>
+                      </button>
+                      <button
+                        className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 text-sm"
+                        onClick={() => openServiceModal(c)}
+                      >
                         View Service History
-                      </Button>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -118,88 +119,106 @@ export default function CustomerList() {
         </div>
 
         {/* Vehicle Details Modal */}
-        <Modal
-          title={`Vehicle Details - ${selectedCustomer?.full_name || ""}`}
-          open={vehicleModalVisible}
-          onCancel={() => setVehicleModalVisible(false)}
-          footer={null}
-          width={800}
-        >
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <Spin size="large" />
+        {vehicleModalVisible && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">
+                  Vehicle Details - {selectedCustomer?.full_name || ""}
+                </h2>
+                <button
+                  onClick={() => setVehicleModalVisible(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+                </div>
+              ) : vehicles.length > 0 ? (
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr className="bg-sky-100">
+                      <th className="p-3">Plate No</th>
+                      <th className="p-3">Brand</th>
+                      <th className="p-3">Model</th>
+                      <th className="p-3">Color</th>
+                      <th className="p-3">Registered Year</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vehicles.map((v) => (
+                      <tr key={v.id} className="border-b hover:bg-gray-50">
+                        <td className="p-3">{v.license_plate}</td>
+                        <td className="p-3">{v.make}</td>
+                        <td className="p-3">{v.model}</td>
+                        <td className="p-3">{v.color}</td>
+                        <td className="p-3">{v.year}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-center text-gray-500">No vehicles found.</p>
+              )}
             </div>
-          ) : vehicles.length > 0 ? (
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="bg-sky-100">
-                  <th className="p-3">Plate No</th>
-                  <th className="p-3">Brand</th>
-                  <th className="p-3">Model</th>
-                  <th classname="p-3">Color</th>
-                  <th className="p-3">Registered Year</th>
-                </tr>
-              </thead>
-              <tbody>
-                {vehicles.map((v) => (
-                  <tr key={v.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{v.license_plate}</td>
-                    <td className="p-3">{v.make}</td>
-                    <td className="p-3">{v.model}</td>
-                    <td className="p-3">{v.color}</td>
-                    <td className="p-3">{v.year}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-center text-gray-500">No vehicles found.</p>
-          )}
-        </Modal>
+          </div>
+        )}
 
         {/* Service History Modal */}
-        <Modal
-          title={`Service History - ${selectedCustomer?.full_name || ""}`}
-          open={serviceModalVisible}
-          onCancel={() => setServiceModalVisible(false)}
-          footer={null}
-          width={900}
-        >
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <Spin size="large" />
+        {serviceModalVisible && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">
+                  Service History - {selectedCustomer?.full_name || ""}
+                </h2>
+                <button
+                  onClick={() => setServiceModalVisible(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+                </div>
+              ) : services.length > 0 ? (
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr className="bg-sky-100">
+                      <th className="p-3">Service ID</th>
+                      <th className="p-3">Date</th>
+                      <th className="p-3">Service Type</th>
+                      <th className="p-3">Description</th>
+                      <th className="p-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {services.map((s) => (
+                      <tr key={s.id} className="border-b hover:bg-gray-50">
+                        <td className="p-3">{s.id}</td>
+                        <td className="p-3">
+                          {new Date(s.created_at).toLocaleDateString()}
+                        </td>
+                        <td className="p-3">{s.service_type}</td>
+                        <td className="p-3">{s.description}</td>
+                        <td className="p-3">{s.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p className="text-center text-gray-500">
+                  No service history found.
+                </p>
+              )}
             </div>
-          ) : services.length > 0 ? (
-            <table className="w-full border-collapse text-left">
-              <thead>
-                <tr className="bg-sky-100">
-                  <th className="p-3">Service ID</th>
-                  <th className="p-3">Date</th>
-                  <th className="p-3">Service Type</th>
-                  <th classname="p-3">Description</th>
-                  <th className="p-3">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {services.map((s) => (
-                  <tr key={s.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3">{s.id}</td>
-                    <td className="p-3">
-                      {new Date(s.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="p-3">{s.service_type}</td>
-                    <td className="p-3">{s.description}</td>
-                    <td className="p-3">{s.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="text-center text-gray-500">
-              No service history found.
-            </p>
-          )}
-        </Modal>
+          </div>
+        )}
       </div>
     </>
   );

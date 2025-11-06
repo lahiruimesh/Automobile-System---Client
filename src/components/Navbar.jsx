@@ -13,6 +13,25 @@ export default function Navbar() {
     navigate("/login");
   };
 
+  const scrollToSection = (sectionId) => {
+    // If not on home page, navigate to home first
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Wait for navigation then scroll
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
   // Hide navbar on dashboard pages and other authenticated pages
   const hiddenPages = [
     '/customer',
@@ -44,15 +63,24 @@ export default function Navbar() {
           <Link to="/" className="hover:underline hover:text-blue-600">
             Home
           </Link>
-          <Link to="/services" className="hover:underline hover:text-blue-600">
+          <button 
+            onClick={() => scrollToSection('services')} 
+            className="hover:underline hover:text-blue-600"
+          >
             Services
-          </Link>
-          <Link to="/about" className="hover:underline hover:text-blue-600">
+          </button>
+          <button 
+            onClick={() => scrollToSection('about')} 
+            className="hover:underline hover:text-blue-600"
+          >
             About
-          </Link>
-          <Link to="/contact" className="hover:underline hover:text-blue-600">
+          </button>
+          <button 
+            onClick={() => scrollToSection('contact')} 
+            className="hover:underline hover:text-blue-600"
+          >
             Contact
-          </Link>
+          </button>
         </nav>
 
         {/* Navigation - Auth Links */}

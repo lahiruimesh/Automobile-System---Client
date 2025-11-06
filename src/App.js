@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { SocketProvider } from "./context/SocketContext";
 import { ToastContainer } from "react-toastify";
-import 'antd/dist/reset.css';
 import "react-toastify/dist/ReactToastify.css";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -31,23 +30,39 @@ function AppContent() {
 
   return (
     <>
+      {/* Show AdminNavbar for admin routes, regular Navbar for others */}
       {isAdminRoute ? <AdminNavbar /> : <Navbar />}
-
+      
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customer" element={<CustomerDashboard />} />
         <Route path="/employee" element={<EmployeeDashboard />} />
+        <Route path="/employee/profile" element={<EmployeeProfile />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/employee-management" element={<EmployeeManagement />} />
         <Route path="/admin/customers" element={<CustomerList />} />
         <Route path="/admin/appointments" element={<AppointmentManagement />} />
-        <Route path="/pending" element={<PendingApproval />} />
         <Route path="/admin/reports" element={<Reports />} />
+        <Route path="/pending" element={<PendingApproval />} />
+        
+        {/* Appointment Routes */}
+        <Route path="/appointments/book" element={<AppointmentBooking />} />
+        <Route path="/appointments/confirmation" element={<AppointmentConfirmation />} />
+        <Route path="/appointments/my-appointments" element={<MyAppointments />} />
+        <Route path="/appointments/track-progress" element={<TrackProgress />} />
       </Routes>
+<<<<<<< Updated upstream
 
       <Footer />
+=======
+      
+      {/* Hide Footer on admin routes */}
+      {!isAdminRoute && <Footer />}
+      
+>>>>>>> Stashed changes
       <Chatbot />
       <ToastContainer position="top-right" autoClose={3000} />
     </>
@@ -55,36 +70,13 @@ function AppContent() {
 }
 
 export default function App() {
-
-
   return (
     <AuthProvider>
       <SocketProvider>
         <BrowserRouter>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/customer" element={<CustomerDashboard />} />
-            <Route path="/employee" element={<EmployeeDashboard />} />
-            <Route path="/employee/profile" element={<EmployeeProfile />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/pending" element={<PendingApproval />} />
-            
-            {/* Appointment Routes */}
-            <Route path="/appointments/book" element={<AppointmentBooking />} />
-            <Route path="/appointments/confirmation" element={<AppointmentConfirmation />} />
-            <Route path="/appointments/my-appointments" element={<MyAppointments />} />
-            <Route path="/appointments/track-progress" element={<TrackProgress />} />
-          </Routes>
-          <Footer />
-          <Chatbot />
+          <AppContent />
         </BrowserRouter>
       </SocketProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
     </AuthProvider>
   );
 }

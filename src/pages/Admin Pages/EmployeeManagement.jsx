@@ -33,14 +33,18 @@ export default function EmployeeManagement() {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const data = await getAllEmployees(); // ✅ use imported function here
-        setEmployees(data);
+        const response = await getAllEmployees();
+        console.log("Employees response:", response);
+        // Handle both old and new response formats
+        const employeesData = response.data || response;
+        setEmployees(Array.isArray(employeesData) ? employeesData : []);
       } catch (error) {
         console.error("Error fetching employees:", error);
+        setEmployees([]);
       }
     };
 
-    fetchEmployees(); // ✅ call once when page loads
+    fetchEmployees();
   }, []);
 
   const handleAddEmployee = async () => {
@@ -60,8 +64,9 @@ export default function EmployeeManagement() {
         employee_certifications: newEmployee.employee_certifications,
       };
 
-      const updatedEmployees = await getAllEmployees();
-      setEmployees(updatedEmployees);
+      const updatedResponse = await getAllEmployees();
+      const updatedEmployees = updatedResponse.data || updatedResponse;
+      setEmployees(Array.isArray(updatedEmployees) ? updatedEmployees : []);
 
       setNewEmployee({
         full_name: "",
@@ -88,8 +93,9 @@ export default function EmployeeManagement() {
       await updateEmployee(selectedEmployee.id, selectedEmployee);
 
       // Refresh employees after successful update
-      const updatedEmployees = await getAllEmployees();
-      setEmployees(updatedEmployees);
+      const updatedResponse = await getAllEmployees();
+      const updatedEmployees = updatedResponse.data || updatedResponse;
+      setEmployees(Array.isArray(updatedEmployees) ? updatedEmployees : []);
 
       setShowEditModal(false);
       setSelectedEmployee(null);
