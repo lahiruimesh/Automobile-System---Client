@@ -9,9 +9,20 @@ const api = axios.create({
 
 // Add token to requests
 api.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  if (user.token) {
-    config.headers.Authorization = `Bearer ${user.token}`;
+  const userStr = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
+  
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  } else if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      if (user?.token) {
+        config.headers.Authorization = `Bearer ${user.token}`;
+      }
+    } catch (error) {
+      console.error("Error parsing user from localStorage:", error);
+    }
   }
   return config;
 });

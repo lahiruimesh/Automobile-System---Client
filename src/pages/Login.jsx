@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { login as loginAPI } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import bgImage from "../assets/loginbg2.png";
 
 
@@ -9,6 +9,10 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the user type from navigation state
+  const userType = location.state?.userType || 'customer';
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -63,7 +67,7 @@ export default function Login() {
           className="p-4 w-full max-w-md"
         >
           <h2 className="text-3xl font-bold text-center mb-10 text-gray-600">
-            Login
+            Login to Your Account
           </h2>
 
           <input

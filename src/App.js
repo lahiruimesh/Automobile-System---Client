@@ -23,6 +23,8 @@ import EmployeeManagement from "./pages/Admin Pages/EmployeeManagement";
 import CustomerList from "./pages/Admin Pages/CustomerList";
 import AppointmentManagement from "./pages/Admin Pages/AppointmentManagement";
 import Reports from "./pages/Admin Pages/Reports";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 function AppContent() {
   const location = useLocation();
@@ -53,6 +55,10 @@ function AppContent() {
         <Route path="/appointments/confirmation" element={<AppointmentConfirmation />} />
         <Route path="/appointments/my-appointments" element={<MyAppointments />} />
         <Route path="/appointments/track-progress" element={<TrackProgress />} />
+        
+        {/* Legal Pages */}
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
       </Routes>
       
       {/* Hide Footer on admin routes */}

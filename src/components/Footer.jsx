@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Twitter, Facebook, Linkedin } from 'lucide-react'; // Social media icons
 
 const Footer = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Hide footer on dashboard pages and other authenticated pages
   const hiddenPages = [
@@ -21,6 +22,28 @@ const Footer = () => {
   if (hiddenPages.includes(location.pathname) || isProfilePage) {
     return null;
   }
+
+  const scrollToSection = (sectionId) => {
+    if (location.pathname !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  const navigateToPage = (path, state = {}) => {
+    navigate(path, { state });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <footer className="bg-gray-800 text-white py-12">
@@ -42,10 +65,10 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link to="/" className="hover:text-blue-400 transition">Home</Link></li>
-              <li><Link to="/services" className="hover:text-blue-400 transition">Our Services</Link></li>
-              <li><Link to="/about" className="hover:text-blue-400 transition">About Us</Link></li>
-              <li><Link to="/contact" className="hover:text-blue-400 transition">Contact</Link></li>
+              <li><button onClick={() => navigateToPage('/')} className="hover:text-blue-400 transition text-left">Home</button></li>
+              <li><button onClick={() => scrollToSection('services')} className="hover:text-blue-400 transition text-left">Our Services</button></li>
+              <li><button onClick={() => scrollToSection('about')} className="hover:text-blue-400 transition text-left">About Us</button></li>
+              <li><button onClick={() => scrollToSection('contact')} className="hover:text-blue-400 transition text-left">Contact</button></li>
             </ul>
           </div>
 
@@ -53,9 +76,30 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Account</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link to="/login" className="hover:text-blue-400 transition">Customer Login</Link></li>
-              <li><Link to="/employee-login" className="hover:text-blue-400 transition">Employee Login</Link></li>
-              <li><Link to="/signup" className="hover:text-blue-400 transition">Sign Up</Link></li>
+              <li>
+                <button 
+                  onClick={() => navigateToPage('/login', { userType: 'customer' })} 
+                  className="hover:text-blue-400 transition text-left"
+                >
+                  Customer Login
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => navigateToPage('/login', { userType: 'employee' })} 
+                  className="hover:text-blue-400 transition text-left"
+                >
+                  Employee Login
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => navigateToPage('/signup')} 
+                  className="hover:text-blue-400 transition text-left"
+                >
+                  Sign Up
+                </button>
+              </li>
             </ul>
           </div>
 
@@ -63,8 +107,22 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Legal</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><Link to="/privacy" className="hover:text-blue-400 transition">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-blue-400 transition">Terms of Service</Link></li>
+              <li>
+                <button 
+                  onClick={() => navigateToPage('/privacy')} 
+                  className="hover:text-blue-400 transition text-left"
+                >
+                  Privacy Policy
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={() => navigateToPage('/terms')} 
+                  className="hover:text-blue-400 transition text-left"
+                >
+                  Terms of Service
+                </button>
+              </li>
             </ul>
           </div>
           

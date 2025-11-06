@@ -60,9 +60,15 @@ export default function Navbar() {
 
         {/* Navigation - Primary Links */}
         <nav className="flex space-x-6">
-          <Link to="/" className="hover:underline hover:text-blue-600">
+          <button 
+            onClick={() => {
+              navigate('/');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }} 
+            className="hover:underline hover:text-blue-600"
+          >
             Home
-          </Link>
+          </button>
           <button 
             onClick={() => scrollToSection('services')} 
             className="hover:underline hover:text-blue-600"
