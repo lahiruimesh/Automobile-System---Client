@@ -184,7 +184,8 @@ export default function ProfileDrawer({ logout }) {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    setOpen(false);
+    navigate("/login");
   };
 
   return (
