@@ -10,7 +10,7 @@ import CustomerDashboard from "./pages/CustomerDashboard";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import EmployeeProfile from "./pages/EmployeeProfile";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminDashboard from "./pages/Admin Pages/AdminDashboard";
+// import AdminDashboard from "./pages/Admin Pages/AdminDashboard";
 import PendingApproval from "./pages/PendingApproval";
 import LandingPage from "./pages/LandingPage";
 import AppointmentBooking from "./pages/AppointmentBooking";
@@ -36,7 +36,6 @@ function AppContent() {
 
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/customer" element={<CustomerDashboard />} />
         <Route path="/employee" element={<EmployeeDashboard />} />
@@ -47,8 +46,6 @@ function AppContent() {
         <Route path="/pending" element={<PendingApproval />} />
         <Route path="/admin/reports" element={<Reports />} />
       </Routes>
-
-      <Footer />
       <Chatbot />
       <ToastContainer position="top-right" autoClose={3000} />
     </>
