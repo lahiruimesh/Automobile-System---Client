@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:5001/api/appointments";
+const API = "http://localhost:5000/api/appointments";
 
 // Get auth token from localStorage
 const getAuthHeader = () => {
@@ -105,7 +105,7 @@ export const deleteVehicle = (vehicleId) => {
  */
 export const requestAppointmentModification = (appointmentId, newSlotId, reason) => {
   return axios.post(
-    `http://localhost:5001/api/admin/appointments/${appointmentId}/request-modification`,
+    `http://localhost:5000/api/admin/appointments/${appointmentId}/request-modification`,
     { newSlotId, reason },
     { headers: getAuthHeader() }
   );
@@ -115,7 +115,7 @@ export const requestAppointmentModification = (appointmentId, newSlotId, reason)
  * Get customer's modification requests
  */
 export const getMyModificationRequests = () => {
-  return axios.get(`http://localhost:5001/api/admin/modifications/my-requests`, {
+  return axios.get(`http://localhost:5000/api/admin/modifications/my-requests`, {
     headers: getAuthHeader(),
   });
 };
@@ -124,7 +124,7 @@ export const getMyModificationRequests = () => {
  * Get all modification requests (Employee/Admin)
  */
 export const getModificationRequests = () => {
-  return axios.get(`http://localhost:5001/api/admin/modifications`, {
+  return axios.get(`http://localhost:5000/api/admin/modifications`, {
     headers: getAuthHeader(),
   });
 };
@@ -134,7 +134,7 @@ export const getModificationRequests = () => {
  */
 export const approveModificationRequest = (modificationId) => {
   return axios.put(
-    `http://localhost:5001/api/admin/modifications/${modificationId}/approve`,
+    `http://localhost:5000/api/admin/modifications/${modificationId}/approve`,
     {},
     { headers: getAuthHeader() }
   );
@@ -145,7 +145,7 @@ export const approveModificationRequest = (modificationId) => {
  */
 export const rejectModificationRequest = (modificationId, rejectionReason) => {
   return axios.put(
-    `http://localhost:5001/api/admin/modifications/${modificationId}/reject`,
+    `http://localhost:5000/api/admin/modifications/${modificationId}/reject`,
     { rejectionReason },
     { headers: getAuthHeader() }
   );

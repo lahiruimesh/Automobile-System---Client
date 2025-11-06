@@ -17,7 +17,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     // Initialize socket connection
-    const socketInstance = io(process.env.REACT_APP_API_URL || "http://localhost:5001", {
+    const socketInstance = io(process.env.REACT_APP_API_URL || "http://localhost:5000", {
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: 5,
