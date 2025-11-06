@@ -84,3 +84,96 @@ export const updateServiceStatus = async (serviceId, status) => {
   const response = await api.patch(`/employee/services/${serviceId}/status`, { status });
   return response.data;
 };
+
+// ==================== ADMIN ====================
+
+
+export const getAllEmployees = async () => {
+  const response = await api.get("/admin/employees/all");
+  return response.data;
+};
+
+export const getTotalEmployees = async () => {
+  const response = await api.get("/admin/employees/total");
+  return response.data;
+};
+
+export const getTotalCustomers = async () => {
+  const response = await api.get("/admin/customers/total");
+  return response.data;
+};
+
+export const getTotalAppointments = async () => {
+  const response = await api.get("/admin/appointments/total");
+  return response.data;
+};
+
+export const getCompletedServices = async () => {
+  const response = await api.get("/admin/services/total");
+  return response.data;
+}
+
+export const addNewEmployee = async (employeeData) => {
+  const response = await api.post("/admin/employees", employeeData);
+  return response.data;
+}
+
+export const updateEmployee = async (employeeId, employeeData) => {
+  const response = await api.put(`/admin/employees/${employeeId}`, employeeData);
+  return response.data;
+}
+
+export const deleteEmployee = async (employeeId) => {
+  const response = await api.delete(`/admin/employees/${employeeId}`);
+  return response.data;
+}
+
+export const getAllCustomers = async () => {
+  const response = await api.get("/admin/customers/all");
+  return response.data;
+}
+
+export const getCustomerVehicles = async (customerId) => {
+  const response = await api.get(`/admin/customers/${customerId}/vehicles`);
+  return response.data;
+}
+
+export const getCustomerServices = async (customerId) => {
+  const response = await api.get(`/admin/customers/${customerId}/services`);
+  return response.data;
+}
+
+export const getServiceStatusSummary = async () => {
+  const response = await api.get("/admin/services/status-summary");
+  return response.data;
+}
+
+export const getWeeklyAppointments = async () => {
+  const response = await api.get("/admin/appointments/weekly");
+  return response.data;
+}
+
+export const getMonthlyAppointments = async () => {
+  const response = await api.get("/admin/appointments/monthly");
+  return response.data;
+}
+
+export const getAllAppointments = async () => {
+  const response = await api.get("/admin/appointments/all");
+  return response.data;
+}
+
+export const getEmployeeReport = async () => {
+  const response = await api.get("/admin/reports/employee");
+  return response.data;
+}
+
+export const getCustomerReport = async () => {
+  const response = await api.get("/admin/reports/customer");
+  return response.data;
+}
+
+export const getAppointmentReport = async () => {
+  const response = await api.get("/admin/reports/appointment");
+  return response.data;
+}

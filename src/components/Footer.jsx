@@ -1,8 +1,27 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Twitter, Facebook, Linkedin } from 'lucide-react'; // Social media icons
 
 const Footer = () => {
+  const location = useLocation();
+
+  // Hide footer on dashboard pages and other authenticated pages
+  const hiddenPages = [
+    '/customer',
+    '/employee',
+    '/admin',
+    '/pending',
+    '/appointments/book',
+    '/appointments/confirmation',
+    '/appointments/my-appointments',
+    '/appointments/track-progress'
+  ];
+  const isProfilePage = location.pathname.startsWith('/employee/profile');
+  
+  if (hiddenPages.includes(location.pathname) || isProfilePage) {
+    return null;
+  }
+
   return (
     <footer className="bg-gray-800 text-white py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
