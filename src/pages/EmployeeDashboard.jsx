@@ -72,15 +72,17 @@ export default function EmployeeDashboard() {
       const serviceData = await getMyAssignments();
       const serviceAssignments = serviceData.assignments || [];
       
-      // Fetch appointments and filter for in_progress ones
+      // Fetch appointments - now filtered by backend to show only assigned ones
       const appointmentResponse = await getUpcomingAppointments();
       const allAppointments = appointmentResponse.data.appointments || [];
-      const inProgressAppointments = allAppointments.filter(
-        apt => apt.status === 'in_progress'
+      
+      // Filter for active appointments (pending, confirmed, in_progress) that are assigned to this employee
+      const activeAppointments = allAppointments.filter(
+        apt => ['pending', 'confirmed', 'in_progress'].includes(apt.status) && apt.assigned_employee_id !== null
       );
       
-      // Transform in_progress appointments to match assignment structure
-      const appointmentAssignments = inProgressAppointments.map(apt => ({
+      // Transform active appointments to match assignment structure
+      const appointmentAssignments = activeAppointments.map(apt => ({
         assignment_id: `apt-${apt.id}`, // Prefix to identify as appointment
         service_id: apt.id,
         title: apt.service_type.replace(/_/g, ' ').toUpperCase(),
@@ -88,7 +90,7 @@ export default function EmployeeDashboard() {
         vehicle_number: apt.license_plate,
         vehicle_model: `${apt.vehicle_make} ${apt.vehicle_model} ${apt.vehicle_year}`,
         customer_name: apt.customer_name,
-        status: 'in_progress',
+        status: apt.status, // Use actual appointment status
         priority: 'high',
         estimated_hours: 2,
         hours_logged: 0,

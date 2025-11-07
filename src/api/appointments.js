@@ -157,3 +157,14 @@ export const rejectModificationRequest = (modificationId, rejectionReason) => {
     { headers: getAuthHeader() }
   );
 };
+
+/**
+ * Assign employee to appointment (Admin only)
+ */
+export const assignEmployeeToAppointment = (appointmentId, employeeId) => {
+  return axios.patch(
+    `${API}/${appointmentId}/assign-employee`,
+    { employee_id: employeeId },
+    { headers: getAuthHeader() }
+  );
+};

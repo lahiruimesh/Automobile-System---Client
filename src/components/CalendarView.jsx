@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getScheduledServices, getMyAvailability } from '../api/employeeApi';
+import { getUpcomingAppointments } from '../api/appointments';
 import { FiCalendar, FiChevronLeft, FiChevronRight, FiClock, FiTool } from 'react-icons/fi';
 
 export default function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [services, setServices] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [availability, setAvailability] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -19,13 +21,20 @@ export default function CalendarView() {
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
 
-      const [servicesRes, availabilityRes] = await Promise.all([
+      const [servicesRes, availabilityRes, appointmentsRes] = await Promise.all([
         getScheduledServices(month, year),
-        getMyAvailability(month, year)
+        getMyAvailability(month, year),
+        getUpcomingAppointments()
       ]);
 
       setServices(servicesRes.data.services || []);
       setAvailability(availabilityRes.data.availability || []);
+      
+      // Filter appointments for current employee that are assigned
+      const myAppointments = (appointmentsRes.data.appointments || []).filter(
+        apt => apt.assigned_employee_id !== null
+      );
+      setAppointments(myAppointments);
     } catch (error) {
       console.error('Error fetching calendar data:', error);
     } finally {
@@ -60,6 +69,16 @@ export default function CalendarView() {
     if (!date) return [];
     const dateStr = date.toISOString().split('T')[0];
     return services.filter(s => s.scheduled_date && s.scheduled_date.startsWith(dateStr));
+  };
+
+  const getAppointmentsForDate = (date) => {
+    if (!date) return [];
+    const dateStr = date.toISOString().split('T')[0];
+    return appointments.filter(apt => {
+      const aptDate = new Date(apt.date);
+      const aptDateStr = aptDate.toISOString().split('T')[0];
+      return aptDateStr === dateStr;
+    });
   };
 
   const getAvailabilityForDate = (date) => {
@@ -188,6 +207,7 @@ export default function CalendarView() {
             <div className="grid grid-cols-7">
               {days.map((date, index) => {
                 const dayServices = getServicesForDate(date);
+                const dayAppointments = getAppointmentsForDate(date);
                 const dayAvailability = getAvailabilityForDate(date);
                 const isCurrentDay = isToday(date);
                 const isPastDay = isPast(date);
@@ -226,9 +246,10 @@ export default function CalendarView() {
                           )}
                         </div>
 
-                        {/* Services */}
+                        {/* Services & Appointments */}
                         <div className="space-y-1">
-                          {dayServices.slice(0, 3).map((service, idx) => (
+                          {/* Regular Services */}
+                          {dayServices.slice(0, 2).map((service, idx) => (
                             <div
                               key={service.id}
                               className={`text-xs p-1 rounded ${getPriorityColor(service.priority)} text-white truncate`}
@@ -240,9 +261,26 @@ export default function CalendarView() {
                               </div>
                             </div>
                           ))}
-                          {dayServices.length > 3 && (
+                          
+                          {/* Appointments */}
+                          {dayAppointments.slice(0, 2).map((apt, idx) => (
+                            <div
+                              key={`apt-${apt.id}`}
+                              className="text-xs p-1 rounded bg-purple-500 text-white truncate"
+                              title={`${apt.service_type.replace(/_/g, ' ').toUpperCase()} - ${apt.license_plate} (${apt.start_time}-${apt.end_time})`}
+                            >
+                              <div className="flex items-center gap-1">
+                                <FiCalendar size={10} />
+                                <span className="truncate">
+                                  {apt.service_type.replace(/_/g, ' ').toUpperCase()} ({apt.start_time})
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          {(dayServices.length + dayAppointments.length) > 4 && (
                             <div className="text-xs text-gray-500 font-medium">
-                              +{dayServices.length - 3} more
+                              +{dayServices.length + dayAppointments.length - 4} more
                             </div>
                           )}
                         </div>
@@ -268,6 +306,7 @@ export default function CalendarView() {
               
               {(() => {
                 const dayServices = getServicesForDate(selectedDate);
+                const dayAppointments = getAppointmentsForDate(selectedDate);
                 const dayAvailability = getAvailabilityForDate(selectedDate);
                 
                 return (
@@ -296,10 +335,56 @@ export default function CalendarView() {
                       </div>
                     )}
 
+                    {/* Appointments */}
+                    {dayAppointments.length > 0 && (
+                      <div>
+                        <p className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                          <FiCalendar className="text-purple-600" />
+                          Customer Appointments ({dayAppointments.length})
+                        </p>
+                        <div className="space-y-2">
+                          {dayAppointments.map(apt => (
+                            <div key={apt.id} className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <p className="font-semibold text-purple-900">
+                                    {apt.service_type.replace(/_/g, ' ').toUpperCase()}
+                                  </p>
+                                  <p className="text-sm text-gray-700">
+                                    {apt.license_plate} - {apt.vehicle_make} {apt.vehicle_model} ({apt.vehicle_year})
+                                  </p>
+                                  <p className="text-sm text-gray-700">{apt.customer_name}</p>
+                                  <p className="text-sm text-gray-600">{apt.customer_phone}</p>
+                                </div>
+                                <span className="px-2 py-1 rounded text-xs font-medium bg-purple-500 text-white">
+                                  {apt.status}
+                                </span>
+                              </div>
+                              <div className="mt-2 p-2 bg-white rounded border border-purple-200">
+                                <p className="text-xs font-semibold text-purple-700 mb-1">
+                                  📅 Customer's Required Schedule:
+                                </p>
+                                <p className="text-sm text-gray-800 flex items-center gap-2">
+                                  <FiClock className="text-purple-600" />
+                                  <span className="font-medium">{apt.start_time} - {apt.end_time}</span>
+                                </p>
+                              </div>
+                              {apt.notes && (
+                                <p className="text-xs text-gray-600 mt-2">
+                                  <span className="font-semibold">Notes:</span> {apt.notes}
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Services */}
                     {dayServices.length > 0 ? (
                       <div>
-                        <p className="font-semibold text-gray-800 mb-2">
+                        <p className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                          <FiTool className="text-sky-600" />
                           Scheduled Services ({dayServices.length})
                         </p>
                         <div className="space-y-2">
@@ -325,8 +410,11 @@ export default function CalendarView() {
                           ))}
                         </div>
                       </div>
-                    ) : (
-                      <p className="text-gray-500 text-sm">No services scheduled for this day</p>
+                    ) : null}
+                    
+                    {/* No items message */}
+                    {dayServices.length === 0 && dayAppointments.length === 0 && !dayAvailability && (
+                      <p className="text-gray-500 text-sm">No services or appointments scheduled for this day</p>
                     )}
                   </div>
                 );

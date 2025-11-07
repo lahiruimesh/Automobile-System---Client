@@ -22,7 +22,7 @@ import Chatbot from "./components/Chatbot";
 import AdminNavbar from "./components/adminNavbar";
 import EmployeeManagement from "./pages/Admin Pages/EmployeeManagement";
 import CustomerList from "./pages/Admin Pages/CustomerList";
-import AppointmentManagement from "./pages/Admin Pages/AppointmentManagement";
+import AppointmentsManagement from "./pages/Admin Pages/AppointmentsManagement";
 import Reports from "./pages/Admin Pages/Reports";
 
 function AppContent() {
@@ -44,7 +44,7 @@ function AppContent() {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/employee-management" element={<EmployeeManagement />} />
         <Route path="/admin/customers" element={<CustomerList />} />
-        <Route path="/admin/appointments" element={<AppointmentManagement />} />
+        <Route path="/admin/appointments" element={<AppointmentsManagement />} />
         <Route path="/pending" element={<PendingApproval />} />
         <Route path="/admin/reports" element={<Reports />} />
         
@@ -55,7 +55,7 @@ function AppContent() {
         <Route path="/appointments/track-progress" element={<TrackProgress />} />
       </Routes>
 
-      <Footer />
+      {!isAdminRoute && <Footer />}
       <Chatbot />
     </>
   );
