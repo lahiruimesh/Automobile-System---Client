@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://localhost:5000"; // backend
+const API = "http://localhost:5001"; // backend
 
 export const signup = (data) => axios.post(`${API}/api/auth/signup`, data);
 export const login = (data) => axios.post(`${API}/api/auth/login`, data);

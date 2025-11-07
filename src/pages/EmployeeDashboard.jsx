@@ -60,7 +60,7 @@ export default function EmployeeDashboard() {
   // Notification helper
   const showNotification = useCallback((message, type = "info") => {
     setNotification({ message, type });
-    setTimeout(() => setNotification(null), 5000);
+    setTimeout(() => setNotification(null), 5001);
   }, []);
 
   // API Calls

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getPendingEmployees, approveEmployee } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import AdminRequestManager from "../components/AdminRequestManager";
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
   const [activeTab, setActiveTab] = useState("requests");
 
@@ -30,9 +32,22 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 pt-20">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Admin Dashboard</h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Admin Dashboard</h2>
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium"
+        >
+          Logout
+        </button>
+      </div>
 
       <div className="mb-6">
         <div className="border-b border-gray-200">
