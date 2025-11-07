@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import AdminNavbar from "../../components/adminNavbar";
-import { FileText, Download, Eye } from "lucide-react";
-import { Modal, Table, message } from "antd";
+import { FileText, Download, Eye, X } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {
@@ -31,7 +30,7 @@ export default function Reports() {
       setReportData(data);
     } catch (error) {
       console.error("Error fetching report:", error);
-      message.error("Failed to fetch report data.");
+      alert("Failed to fetch report data.");
       setReportData([]);
     } finally {
       setLoading(false);
@@ -41,7 +40,7 @@ export default function Reports() {
   // Download report as PDF
   const handleDownloadReport = () => {
     if (!reportData || reportData.length === 0) {
-      message.warning("No data to export!");
+      alert("No data to export!");
       return;
     }
 
@@ -176,37 +175,71 @@ export default function Reports() {
         </div>
 
         {/* Report Modal */}
-        <Modal
-          title={`${selectedReport?.toUpperCase()} REPORT`}
-          open={isModalOpen}
-          onCancel={() => setIsModalOpen(false)}
-          width={900}
-          footer={[
-            <button
-              key="cancel"
-              onClick={() => setIsModalOpen(false)}
-              className="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400 mr-2"
-            >
-              Close
-            </button>,
-            <button
-              key="download"
-              onClick={handleDownloadReport}
-              className="bg-sky-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-sky-700"
-            >
-              <Download size={16} /> Download PDF
-            </button>,
-          ]}
-        >
-          <Table
-            loading={loading}
-            columns={getColumns()}
-            dataSource={reportData}
-            rowKey="id"
-            pagination={false}
-            scroll={{ x: true }}
-          />
-        </Modal>
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold">
+                  {selectedReport?.toUpperCase()} REPORT
+                </h2>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600"></div>
+                </div>
+              ) : reportData.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse text-left text-sm">
+                    <thead>
+                      <tr className="bg-sky-600 text-white">
+                        {Object.keys(reportData[0]).map((key) => (
+                          <th key={key} className="p-3">
+                            {key.replace(/_/g, " ").toUpperCase()}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reportData.map((item, idx) => (
+                        <tr key={idx} className="border-b hover:bg-gray-50">
+                          {Object.values(item).map((val, i) => (
+                            <td key={i} className="p-3">
+                              {val || "-"}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 py-8">No data available</p>
+              )}
+
+              <div className="flex justify-end gap-2 mt-6">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={handleDownloadReport}
+                  className="bg-sky-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-sky-700"
+                >
+                  <Download size={16} /> Download PDF
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

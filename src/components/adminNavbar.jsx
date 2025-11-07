@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
   Home,
@@ -12,6 +12,12 @@ import {
 export default function AdminNavbar() {
   const { logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   const menuItems = [
     { name: "Dashboard", path: "/admin/dashboard", icon: <Home size={18} /> },
@@ -65,8 +71,8 @@ export default function AdminNavbar() {
 
         {/* Logout Button */}
         <button
-          onClick={logout}
-          className="flex items-center gap-2 bg-sky-800 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-sky-800 transition"
+          onClick={handleLogout}
+          className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition font-medium shadow-md"
         >
           <LogOut size={18} />
           Logout

@@ -9,23 +9,37 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("requests");
 
   useEffect(() => {
+    console.log('[AdminDashboard] Component mounted');
+    console.log('[AdminDashboard] User:', user);
     if (user?.token) {
+      console.log('[AdminDashboard] Fetching pending employees...');
       getPendingEmployees(user.token)
-        .then((res) => setEmployees(res.data))
+        .then((res) => {
+          console.log('[AdminDashboard] Pending employees response:', res.data);
+          setEmployees(res.data);
+        })
         .catch((error) => {
-          console.error('Error fetching pending employees:', error);
+          console.error('[AdminDashboard] Error fetching pending employees:', error);
+          console.error('[AdminDashboard] Error details:', error.response?.data);
           setEmployees([]);
         });
+    } else {
+      console.log('[AdminDashboard] No user token available');
     }
   }, [user]);
 
   const approve = async (id) => {
+    console.log('[AdminDashboard] Approving employee:', id);
     if (user?.token) {
       try {
-        await approveEmployee(id, user.token);
+        const response = await approveEmployee(id, user.token);
+        console.log('[AdminDashboard] Approve response:', response.data);
         setEmployees(employees.filter((e) => e.id !== id));
+        alert('Employee approved successfully!');
       } catch (error) {
-        console.error('Error approving employee:', error);
+        console.error('[AdminDashboard] Error approving employee:', error);
+        console.error('[AdminDashboard] Error details:', error.response?.data);
+        alert(error.response?.data?.message || 'Failed to approve employee');
       }
     }
   };

@@ -49,9 +49,11 @@ export default function AdminDashboard() {
 
   // Fetch Pending Employee Requests
   useEffect(() => {
-    getPendingEmployees(user.token)
-      .then((res) => setEmployees(res.data))
-      .catch((err) => console.error("Error fetching pending employees:", err));
+    if (user?.token) {
+      getPendingEmployees(user.token)
+        .then((res) => setEmployees(res.data))
+        .catch((err) => console.error("Error fetching pending employees:", err));
+    }
   }, [user]);
 
   // Fetch Service Status Pie Chart Data
@@ -72,11 +74,19 @@ export default function AdminDashboard() {
   }, []);
 
   const handleApprove = async (id) => {
+    if (!user?.token) {
+      alert("You must be logged in to approve employees");
+      return;
+    }
+    
     try {
-      await approveEmployee(id, user.token);
+      const response = await approveEmployee(id, user.token);
+      console.log("Employee approved:", response.data);
       setEmployees((prev) => prev.filter((e) => e.id !== id));
+      alert("Employee approved successfully!");
     } catch (error) {
       console.error("Error approving employee:", error);
+      alert(error.response?.data?.message || "Failed to approve employee");
     }
   };
 
@@ -190,7 +200,7 @@ export default function AdminDashboard() {
                   >
                     <div>
                       <p className="font-medium text-gray-800">
-                        {emp.firstName} {emp.lastName}
+                        {emp.full_name}
                       </p>
                       <p className="text-sm text-gray-500">{emp.email}</p>
                     </div>

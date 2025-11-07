@@ -312,7 +312,7 @@ export default function EmployeeDashboard() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold">Employee Dashboard</h1>
-              <p className="text-sky-100 mt-1">Welcome back, {user?.full_name || user?.email}</p>
+              <p className="text-sky-100 mt-1">Welcome back, {user?.fullName || user?.full_name || user?.email}</p>
             </div>
             <div className="flex items-center gap-3">
               <NotificationBell />

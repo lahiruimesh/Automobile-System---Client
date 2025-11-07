@@ -28,7 +28,10 @@ export default function ServiceRequestForm({ onSuccess }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await createServiceRequest(formData);
+      console.log("Creating service request with data:", formData);
+      const response = await createServiceRequest(formData);
+      console.log("Service request created:", response);
+      alert("Service request created successfully!");
       setFormData({
         serviceType: "",
         description: "",
@@ -37,6 +40,7 @@ export default function ServiceRequestForm({ onSuccess }) {
       onSuccess?.();
     } catch (error) {
       console.error("Error creating request:", error);
+      alert("Failed to create service request. Please try again.");
     } finally {
       setLoading(false);
     }

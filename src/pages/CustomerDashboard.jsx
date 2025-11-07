@@ -2,7 +2,9 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getMyAppointments } from "../api/appointments";
+import { getUserRequests } from "../api/serviceRequests";
 import { format } from "date-fns";
+import ServiceRequestForm from "../components/ServiceRequestForm";
 import { 
   FiCalendar, 
   FiClipboard, 
@@ -24,12 +26,24 @@ export default function CustomerDashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
+  const [serviceRequests, setServiceRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview"); // overview, appointments, services
+  const [activeTab, setActiveTab] = useState("overview"); // overview, appointments, services, requests
 
   useEffect(() => {
     fetchAppointments();
+    fetchServiceRequests();
   }, []);
+
+  const fetchServiceRequests = async () => {
+    try {
+      const response = await getUserRequests();
+      console.log("Service requests response:", response);
+      setServiceRequests(response.data || []);
+    } catch (error) {
+      console.error("Error fetching service requests:", error);
+    }
+  };
 
   const fetchAppointments = async () => {
     try {
@@ -122,6 +136,17 @@ export default function CustomerDashboard() {
             >
               <FiTool size={20} />
               Services
+            </button>
+            <button
+              onClick={() => setActiveTab("requests")}
+              className={`flex items-center gap-2 px-6 py-4 font-semibold border-b-4 transition ${
+                activeTab === "requests"
+                  ? "border-sky-500 text-sky-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <FiClipboard size={20} />
+              Service Requests
             </button>
           </div>
         </div>
@@ -422,6 +447,81 @@ export default function CustomerDashboard() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+        {/* Service Requests Tab */}
+        {activeTab === "requests" && (
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">My Service Requests</h2>
+            
+            {/* Service Request Form */}
+            <div className="mb-8">
+              <ServiceRequestForm onSuccess={fetchServiceRequests} />
+            </div>
+
+            {/* Service Requests List */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">My Requests</h3>
+              {serviceRequests.length === 0 ? (
+                <div className="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+                  <FiClipboard className="mx-auto text-gray-300 text-5xl mb-3" />
+                  <p>No service requests yet. Create your first request above!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {serviceRequests.map((request) => (
+                    <div key={request.id} className="bg-white rounded-lg shadow-md p-6">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-800">{request.service_type}</h4>
+                          <p className="text-sm text-gray-500">
+                            Created: {new Date(request.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            request.status === "pending"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : request.status === "in-progress"
+                              ? "bg-blue-100 text-blue-800"
+                              : request.status === "completed"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {request.status}
+                        </span>
+                      </div>
+                      
+                      <p className="text-gray-600 mb-3">{request.description}</p>
+                      
+                      <div className="text-sm text-gray-500">
+                        <p>
+                          Vehicle: {request.vehicle_info?.year} {request.vehicle_info?.make}{" "}
+                          {request.vehicle_info?.model}
+                        </p>
+                      </div>
+
+                      {request.progress > 0 && (
+                        <div className="mt-4">
+                          <div className="flex justify-between text-xs text-gray-600 mb-1">
+                            <span>Progress</span>
+                            <span>{request.progress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className="bg-blue-500 h-2 rounded-full transition-all"
+                              style={{ width: `${request.progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { login as loginAPI } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import bgImage from "../assets/loginbg2.png";
 
 
@@ -9,6 +9,10 @@ export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the user type from navigation state
+  const userType = location.state?.userType || 'customer';
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,18 +21,29 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await loginAPI(form);
-      console.log(res.data.user);
-      login(res.data.user);
+      console.log('Login response:', res.data);
+      
+      // Add token to user object before saving
+      const userWithToken = { ...res.data.user, token: res.data.token };
+      login(userWithToken);
 
       localStorage.setItem("token", res.data.token); 
 
-      if (res.data.user.role === "customer") navigate("/customer");
-      else if (res.data.user.role === "employee" && res.data.is_active)
-        navigate("/employee");
-      else if (res.data.user.role === "employee" && !res.data.is_active)
-        navigate("/pending");
-      else if (res.data.user.role === "admin") navigate("/admin");
+      // Route based on user role
+      if (res.data.user.role === "admin") {
+        navigate("/admin");
+      } else if (res.data.user.role === "customer") {
+        navigate("/customer");
+      } else if (res.data.user.role === "employee") {
+        // Check if employee is active
+        if (res.data.user.isActive) {
+          navigate("/employee");
+        } else {
+          navigate("/pending");
+        }
+      }
     } catch (err) {
+      console.error('Login error:', err);
       alert(err.response?.data?.message || "Login failed");
     }
   };
@@ -52,7 +67,7 @@ export default function Login() {
           className="p-4 w-full max-w-md"
         >
           <h2 className="text-3xl font-bold text-center mb-10 text-gray-600">
-            Login
+            Login to Your Account
           </h2>
 
           <input
