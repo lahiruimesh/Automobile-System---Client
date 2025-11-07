@@ -191,7 +191,7 @@ export default function TrackProgress() {
     <div className="track-progress-container pt-16">
       {/* Header */}
       <div className="track-header">
-        <button className="back-button" onClick={() => navigate("/customer-dashboard")}>
+        <button className="back-button" onClick={() => navigate("/customer")}>
           <FiArrowLeft size={20} />
           Back to Dashboard
         </button>
