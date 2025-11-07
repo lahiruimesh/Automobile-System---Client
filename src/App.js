@@ -39,52 +39,37 @@ function AppContent() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/customer" element={<CustomerDashboard />} />
         <Route path="/employee" element={<EmployeeDashboard />} />
+        <Route path="/employee/profile" element={<EmployeeProfile />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/employee-management" element={<EmployeeManagement />} />
         <Route path="/admin/customers" element={<CustomerList />} />
         <Route path="/admin/appointments" element={<AppointmentManagement />} />
         <Route path="/pending" element={<PendingApproval />} />
         <Route path="/admin/reports" element={<Reports />} />
+        
+        {/* Appointment Routes */}
+        <Route path="/appointments/book" element={<AppointmentBooking />} />
+        <Route path="/appointments/confirmation" element={<AppointmentConfirmation />} />
+        <Route path="/appointments/my-appointments" element={<MyAppointments />} />
+        <Route path="/appointments/track-progress" element={<TrackProgress />} />
       </Routes>
 
       <Footer />
       <Chatbot />
-      <ToastContainer position="top-right" autoClose={3000} />
     </>
   );
 }
 
 export default function App() {
-
-
   return (
     <AuthProvider>
       <SocketProvider>
         <BrowserRouter>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/customer" element={<CustomerDashboard />} />
-            <Route path="/employee" element={<EmployeeDashboard />} />
-            <Route path="/employee/profile" element={<EmployeeProfile />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/pending" element={<PendingApproval />} />
-            
-            {/* Appointment Routes */}
-            <Route path="/appointments/book" element={<AppointmentBooking />} />
-            <Route path="/appointments/confirmation" element={<AppointmentConfirmation />} />
-            <Route path="/appointments/my-appointments" element={<MyAppointments />} />
-            <Route path="/appointments/track-progress" element={<TrackProgress />} />
-          </Routes>
-          <Footer />
-          <Chatbot />
+          <AppContent />
+          <ToastContainer position="top-right" autoClose={3000} />
         </BrowserRouter>
       </SocketProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
     </AuthProvider>
   );
 }
