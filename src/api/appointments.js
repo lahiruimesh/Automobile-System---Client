@@ -65,10 +65,17 @@ export const getUpcomingAppointments = () => {
 /**
  * Update appointment status (for employees/admins)
  */
-export const updateAppointmentStatus = (appointmentId, status) => {
+export const updateAppointmentStatus = (appointmentId, status, completionNotes = null) => {
+  const payload = { status };
+  
+  // Add completion notes if provided (typically for 'completed' status)
+  if (completionNotes) {
+    payload.completionNotes = completionNotes;
+  }
+
   return axios.patch(
     `${API}/${appointmentId}/status`,
-    { status },
+    payload,
     { headers: getAuthHeader() }
   );
 };
