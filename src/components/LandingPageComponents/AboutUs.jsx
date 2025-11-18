@@ -1,5 +1,5 @@
 import React from 'react';
-// You might add an image here later, e.g., import GarageImage from '../../assets/garage.jpg';
+import { FaCar, FaTools, FaChartLine } from 'react-icons/fa';
 
 const AboutUs = () => {
   return (
@@ -42,11 +42,33 @@ const AboutUs = () => {
             </ul>
           </div>
 
-          {/* Placeholder/Visual Element (You can insert an image here) */}
+          {/* Visual Element with Icons */}
           <div className="hidden md:block">
-            <div className="bg-gray-200 h-96 rounded-2xl shadow-xl flex items-center justify-center border-4 border-white">
-              {/*  */}
-              <p className="text-gray-500 font-semibold">Image Placeholder: Modern Garage/Team</p>
+            <div className="bg-gradient-to-br from-blue-600 to-blue-800 h-96 rounded-2xl shadow-xl flex flex-col items-center justify-center border-4 border-white p-8 space-y-8">
+              <div className="grid grid-cols-3 gap-8 w-full">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="bg-white/20 backdrop-blur-lg p-6 rounded-full">
+                    <FaCar className="text-white text-5xl" />
+                  </div>
+                  <p className="text-white text-sm font-semibold text-center">Vehicle Care</p>
+                </div>
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="bg-white/20 backdrop-blur-lg p-6 rounded-full">
+                    <FaTools className="text-white text-5xl" />
+                  </div>
+                  <p className="text-white text-sm font-semibold text-center">Expert Service</p>
+                </div>
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="bg-white/20 backdrop-blur-lg p-6 rounded-full">
+                    <FaChartLine className="text-white text-5xl" />
+                  </div>
+                  <p className="text-white text-sm font-semibold text-center">Live Tracking</p>
+                </div>
+              </div>
+              <div className="text-center">
+                <h4 className="text-white text-2xl font-bold mb-2">Modern Auto Service</h4>
+                <p className="text-white/90 text-sm">Technology-Driven Excellence</p>
+              </div>
             </div>
           </div>
         </div>

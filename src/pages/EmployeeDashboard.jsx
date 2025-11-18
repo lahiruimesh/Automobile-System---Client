@@ -67,8 +67,43 @@ export default function EmployeeDashboard() {
   const fetchAssignments = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await getMyAssignments();
-      setAssignments(data.assignments || []);
+      
+      // Fetch regular service assignments
+      const serviceData = await getMyAssignments();
+      const serviceAssignments = serviceData.assignments || [];
+      
+      // Fetch appointments - now filtered by backend to show only assigned ones
+      const appointmentResponse = await getUpcomingAppointments();
+      const allAppointments = appointmentResponse.data.appointments || [];
+      
+      // Filter for active appointments (pending, confirmed, in_progress) that are assigned to this employee
+      const activeAppointments = allAppointments.filter(
+        apt => ['pending', 'confirmed', 'in_progress'].includes(apt.status) && apt.assigned_employee_id !== null
+      );
+      
+      // Transform active appointments to match assignment structure
+      const appointmentAssignments = activeAppointments.map(apt => ({
+        assignment_id: `apt-${apt.id}`, // Prefix to identify as appointment
+        service_id: apt.id,
+        title: apt.service_type.replace(/_/g, ' ').toUpperCase(),
+        description: apt.notes || 'Appointment-based service',
+        vehicle_number: apt.license_plate,
+        vehicle_model: `${apt.vehicle_make} ${apt.vehicle_model} ${apt.vehicle_year}`,
+        customer_name: apt.customer_name,
+        status: apt.status, // Use actual appointment status
+        priority: 'high',
+        estimated_hours: 2,
+        hours_logged: 0,
+        assigned_at: apt.booked_at,
+        deadline: apt.date,
+        is_appointment: true, // Flag to identify appointment-based assignments
+        appointment_data: apt // Store full appointment data
+      }));
+      
+      // Combine both types of assignments
+      const combinedAssignments = [...serviceAssignments, ...appointmentAssignments];
+      
+      setAssignments(combinedAssignments);
     } catch (error) {
       showNotification("Failed to load assignments", "error");
     } finally {
@@ -205,9 +240,36 @@ export default function EmployeeDashboard() {
 
   const handleUpdateStatus = async (appointmentId, newStatus) => {
     try {
-      await updateAppointmentStatus(appointmentId, newStatus);
+      let completionNotes = null;
+
+      // Prompt for completion notes when marking as completed
+      if (newStatus === "completed") {
+        completionNotes = window.prompt(
+          "Please add completion notes for this appointment:",
+          "Service completed successfully"
+        );
+
+        // If user cancels, don't proceed
+        if (completionNotes === null) {
+          return;
+        }
+
+        // Trim the notes
+        completionNotes = completionNotes.trim();
+
+        // Validate notes are not empty
+        if (!completionNotes) {
+          showNotification("Completion notes are required", "error");
+          return;
+        }
+      }
+
+      await updateAppointmentStatus(appointmentId, newStatus, completionNotes);
       showNotification(`Appointment ${newStatus}!`, "success");
+      
+      // Refresh both appointments and assignments
       fetchAppointments();
+      fetchAssignments(); // Refresh assignments to show/hide in_progress appointments
     } catch (error) {
       showNotification(
         error.response?.data?.message || "Failed to update appointment status",
@@ -459,9 +521,23 @@ export default function EmployeeDashboard() {
                 {assignments.map((assignment) => (
                   <div
                     key={assignment.assignment_id}
-                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border border-gray-200 cursor-pointer"
+                    className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition border-2 cursor-pointer ${
+                      assignment.is_appointment 
+                        ? 'border-purple-300 bg-purple-50' 
+                        : 'border-gray-200'
+                    }`}
                     onClick={() => setSelectedServiceId(assignment.service_id)}
                   >
+                    {/* Appointment Badge */}
+                    {assignment.is_appointment && (
+                      <div className="flex items-center gap-2 mb-3">
+                        <FiCalendar className="text-purple-600" size={16} />
+                        <span className="text-xs font-semibold text-purple-700 bg-purple-200 px-3 py-1 rounded-full">
+                          📅 APPOINTMENT-BASED
+                        </span>
+                      </div>
+                    )}
+                    
                     {/* Header */}
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
@@ -471,6 +547,11 @@ export default function EmployeeDashboard() {
                         <p className="text-sm text-gray-500">
                           {assignment.vehicle_number} • {assignment.vehicle_model}
                         </p>
+                        {assignment.is_appointment && (
+                          <p className="text-xs text-purple-600 mt-1">
+                            Customer: {assignment.customer_name}
+                          </p>
+                        )}
                       </div>
                       <div className="flex flex-col gap-2">
                         <span

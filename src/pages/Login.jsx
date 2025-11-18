@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { login as loginAPI } from "../api/auth";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -13,6 +13,11 @@ export default function Login() {
   
   // Get the user type from navigation state
   const userType = location.state?.userType || 'customer';
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -50,7 +55,7 @@ export default function Login() {
 
   return (
     <div
-      className="flex h-screen pt-16"
+      className="flex h-screen"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
@@ -61,7 +66,7 @@ export default function Login() {
       <div className="hidden lg:flex flex-1"></div>
 
       {/* Form on the right */}
-      <div className="flex-col mt-4 justify-center p-24">
+      <div className="flex flex-col justify-center p-8 lg:p-24 pt-20">
         <form
           onSubmit={handleSubmit}
           className="p-4 w-full max-w-md"

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { getScheduledServices, getMyAvailability } from '../api/employeeApi';
-import { FiCalendar, FiChevronLeft, FiChevronRight, FiClock, FiTool } from 'react-icons/fi';
+import { getScheduledServices, getMyAvailability, getMyAssignments } from '../api/employeeApi';
+import { FiCalendar, FiChevronLeft, FiChevronRight, FiClock, FiTool, FiUser, FiClipboard } from 'react-icons/fi';
 
 export default function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [services, setServices] = useState([]);
+  const [assignments, setAssignments] = useState([]);
   const [availability, setAvailability] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -19,13 +20,15 @@ export default function CalendarView() {
       const month = currentDate.getMonth() + 1;
       const year = currentDate.getFullYear();
 
-      const [servicesRes, availabilityRes] = await Promise.all([
+      const [servicesRes, availabilityRes, assignmentsRes] = await Promise.all([
         getScheduledServices(month, year),
-        getMyAvailability(month, year)
+        getMyAvailability(month, year),
+        getMyAssignments()
       ]);
 
       setServices(servicesRes.data.services || []);
       setAvailability(availabilityRes.data.availability || []);
+      setAssignments(assignmentsRes.data.assignments || []);
     } catch (error) {
       console.error('Error fetching calendar data:', error);
     } finally {
@@ -60,6 +63,19 @@ export default function CalendarView() {
     if (!date) return [];
     const dateStr = date.toISOString().split('T')[0];
     return services.filter(s => s.scheduled_date && s.scheduled_date.startsWith(dateStr));
+  };
+
+  const getAssignmentsForDate = (date) => {
+    if (!date) return [];
+    const dateStr = date.toISOString().split('T')[0];
+    return assignments.filter(a => {
+      // If assignment has a scheduled_date, use it; otherwise show active assignments on all dates
+      if (a.scheduled_date) {
+        return a.scheduled_date.startsWith(dateStr);
+      }
+      // Show active assignments on all dates if no specific scheduled date
+      return a.is_active;
+    });
   };
 
   const getAvailabilityForDate = (date) => {
@@ -143,7 +159,7 @@ export default function CalendarView() {
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-6 mb-4 text-sm">
+      <div className="flex items-center gap-6 mb-4 text-sm flex-wrap">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-red-500 rounded"></div>
           <span className="text-gray-600">Urgent</span>
@@ -155,6 +171,10 @@ export default function CalendarView() {
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-blue-500 rounded"></div>
           <span className="text-gray-600">Normal</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-purple-500 rounded"></div>
+          <span className="text-gray-600">Assignment</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-green-100 rounded border-2 border-green-500"></div>
@@ -188,6 +208,7 @@ export default function CalendarView() {
             <div className="grid grid-cols-7">
               {days.map((date, index) => {
                 const dayServices = getServicesForDate(date);
+                const dayAssignments = getAssignmentsForDate(date);
                 const dayAvailability = getAvailabilityForDate(date);
                 const isCurrentDay = isToday(date);
                 const isPastDay = isPast(date);
@@ -226,11 +247,12 @@ export default function CalendarView() {
                           )}
                         </div>
 
-                        {/* Services */}
+                        {/* Services and Assignments */}
                         <div className="space-y-1">
-                          {dayServices.slice(0, 3).map((service, idx) => (
+                          {/* Services */}
+                          {dayServices.slice(0, 2).map((service, idx) => (
                             <div
-                              key={service.id}
+                              key={`service-${service.id}`}
                               className={`text-xs p-1 rounded ${getPriorityColor(service.priority)} text-white truncate`}
                               title={`${service.title} - ${service.vehicle_number}`}
                             >
@@ -240,9 +262,25 @@ export default function CalendarView() {
                               </div>
                             </div>
                           ))}
-                          {dayServices.length > 3 && (
+                          
+                          {/* Assignments */}
+                          {dayAssignments.slice(0, Math.max(3 - dayServices.length, 1)).map((assignment, idx) => (
+                            <div
+                              key={`assignment-${assignment.assignment_id}`}
+                              className="text-xs p-1 rounded bg-purple-500 text-white truncate"
+                              title={`Assignment: ${assignment.title} - ${assignment.vehicle_number}`}
+                            >
+                              <div className="flex items-center gap-1">
+                                <FiUser size={10} />
+                                <span className="truncate">{assignment.title}</span>
+                              </div>
+                            </div>
+                          ))}
+                          
+                          {/* Show total count if more items */}
+                          {(dayServices.length + dayAssignments.length) > 3 && (
                             <div className="text-xs text-gray-500 font-medium">
-                              +{dayServices.length - 3} more
+                              +{(dayServices.length + dayAssignments.length) - 3} more
                             </div>
                           )}
                         </div>
@@ -268,6 +306,7 @@ export default function CalendarView() {
               
               {(() => {
                 const dayServices = getServicesForDate(selectedDate);
+                const dayAssignments = getAssignmentsForDate(selectedDate);
                 const dayAvailability = getAvailabilityForDate(selectedDate);
                 
                 return (
@@ -297,8 +336,8 @@ export default function CalendarView() {
                     )}
 
                     {/* Services */}
-                    {dayServices.length > 0 ? (
-                      <div>
+                    {dayServices.length > 0 && (
+                      <div className="mb-4">
                         <p className="font-semibold text-gray-800 mb-2">
                           Scheduled Services ({dayServices.length})
                         </p>
@@ -325,8 +364,56 @@ export default function CalendarView() {
                           ))}
                         </div>
                       </div>
-                    ) : (
-                      <p className="text-gray-500 text-sm">No services scheduled for this day</p>
+                    )}
+
+                    {/* Assignments */}
+                    {dayAssignments.length > 0 && (
+                      <div className="mb-4">
+                        <p className="font-semibold text-gray-800 mb-2">
+                          My Assignments ({dayAssignments.length})
+                        </p>
+                        <div className="space-y-2">
+                          {dayAssignments.map(assignment => (
+                            <div key={assignment.assignment_id} className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <p className="font-semibold text-gray-800 flex items-center gap-1">
+                                    <FiClipboard size={14} className="text-purple-600" />
+                                    {assignment.title}
+                                  </p>
+                                  <p className="text-sm text-gray-600">{assignment.vehicle_number} - {assignment.vehicle_model}</p>
+                                  <p className="text-sm text-gray-600">{assignment.customer_name}</p>
+                                  <p className="text-sm text-purple-600 font-medium">Role: {assignment.assignment_role}</p>
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
+                                  <span className={`px-2 py-1 rounded text-xs font-medium ${getPriorityColor(assignment.priority)} text-white`}>
+                                    {assignment.priority}
+                                  </span>
+                                  <span className="px-2 py-1 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                                    {assignment.status}
+                                  </span>
+                                </div>
+                              </div>
+                              {assignment.estimated_hours && (
+                                <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                                  <FiClock size={12} />
+                                  Estimated: {assignment.estimated_hours}h
+                                </p>
+                              )}
+                              {assignment.assignment_notes && (
+                                <p className="text-xs text-gray-600 mt-2 bg-white rounded p-2">
+                                  <strong>Notes:</strong> {assignment.assignment_notes}
+                                </p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Show message if no items */}
+                    {dayServices.length === 0 && dayAssignments.length === 0 && (
+                      <p className="text-gray-500 text-sm">No services or assignments for this day</p>
                     )}
                   </div>
                 );

@@ -65,10 +65,17 @@ export const getUpcomingAppointments = () => {
 /**
  * Update appointment status (for employees/admins)
  */
-export const updateAppointmentStatus = (appointmentId, status) => {
+export const updateAppointmentStatus = (appointmentId, status, completionNotes = null) => {
+  const payload = { status };
+  
+  // Add completion notes if provided (typically for 'completed' status)
+  if (completionNotes) {
+    payload.completionNotes = completionNotes;
+  }
+
   return axios.patch(
     `${API}/${appointmentId}/status`,
-    { status },
+    payload,
     { headers: getAuthHeader() }
   );
 };
@@ -147,6 +154,17 @@ export const rejectModificationRequest = (modificationId, rejectionReason) => {
   return axios.put(
     `http://localhost:5000/api/admin/modifications/${modificationId}/reject`,
     { rejectionReason },
+    { headers: getAuthHeader() }
+  );
+};
+
+/**
+ * Assign employee to appointment (Admin only)
+ */
+export const assignEmployeeToAppointment = (appointmentId, employeeId) => {
+  return axios.patch(
+    `${API}/${appointmentId}/assign-employee`,
+    { employee_id: employeeId },
     { headers: getAuthHeader() }
   );
 };

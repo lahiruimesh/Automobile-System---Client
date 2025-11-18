@@ -70,4 +70,8 @@ export const getScheduledServices = (month, year) => {
   return api.get('/calendar/scheduled-services', { params });
 };
 
+// Assignment APIs
+export const getMyAssignments = () => api.get('/time-logs/assignments');
+export const getAssignmentById = (assignmentId) => api.get(`/time-logs/assignments/${assignmentId}`);
+
 export default api;
