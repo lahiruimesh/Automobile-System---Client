@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signup as signupAPI } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 import bgImage from "../assets/signupbg.png"; // your background image
@@ -13,6 +13,11 @@ export default function Signup() {
   });
 
   const navigate = useNavigate();
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });

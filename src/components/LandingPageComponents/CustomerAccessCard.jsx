@@ -1,8 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-// Note: Update this path to your actual customer-focused image asset
-const CUSTOMER_IMAGE = '/assets/customer-dashboard-preview.jpg'; 
+import { FaCalendarCheck, FaChartBar, FaEye, FaBell } from 'react-icons/fa';
 
 const CustomerAccessCard = () => {
   return (
@@ -10,13 +8,26 @@ const CustomerAccessCard = () => {
       className="flex flex-col md:flex-row items-center bg-white rounded-2xl shadow-2xl overflow-hidden max-w-6xl mx-auto border border-gray-100 transition duration-500 hover:shadow-3xl"
     >
       
-      {/* Image on Left */}
-      <div className="w-full md:w-1/2 h-64 md:h-96">
-        <img 
-          src={CUSTOMER_IMAGE} 
-          alt="Customer Dashboard Preview" 
-          className="w-full h-full object-cover"
-        />
+      {/* Visual Element on Left */}
+      <div className="w-full md:w-1/2 h-64 md:h-96 bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center p-8">
+        <div className="grid grid-cols-2 gap-8 w-full max-w-md">
+          <div className="flex flex-col items-center space-y-4 bg-white/10 backdrop-blur-lg p-6 rounded-xl">
+            <FaCalendarCheck className="text-white text-5xl" />
+            <p className="text-white text-sm font-semibold text-center">Book Services</p>
+          </div>
+          <div className="flex flex-col items-center space-y-4 bg-white/10 backdrop-blur-lg p-6 rounded-xl">
+            <FaChartBar className="text-white text-5xl" />
+            <p className="text-white text-sm font-semibold text-center">Track Progress</p>
+          </div>
+          <div className="flex flex-col items-center space-y-4 bg-white/10 backdrop-blur-lg p-6 rounded-xl">
+            <FaEye className="text-white text-5xl" />
+            <p className="text-white text-sm font-semibold text-center">Live Updates</p>
+          </div>
+          <div className="flex flex-col items-center space-y-4 bg-white/10 backdrop-blur-lg p-6 rounded-xl">
+            <FaBell className="text-white text-5xl" />
+            <p className="text-white text-sm font-semibold text-center">Notifications</p>
+          </div>
+        </div>
       </div>
 
       {/* Content on Right */}
@@ -34,7 +45,7 @@ const CustomerAccessCard = () => {
         </p>
         
         <Link 
-          to="/customer" 
+          to="/login"
           className="inline-block bg-blue-600 text-white font-semibold py-3 px-8 rounded-xl hover:bg-blue-700 transition duration-200 shadow-md"
         >
           Go to My Dashboard

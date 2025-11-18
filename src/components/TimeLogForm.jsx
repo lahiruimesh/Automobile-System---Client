@@ -77,6 +77,57 @@ export default function TimeLogForm({ assignment, onSubmit, onCancel, initialDat
           <p className="text-sm text-gray-600">
             <span className="font-semibold">Vehicle:</span> {assignment.vehicle_number} ({assignment.vehicle_model})
           </p>
+          
+          {/* Display Customer's Required Date and Time for Appointments */}
+          {assignment.appointment_data && (
+            <div className="mt-3 pt-3 border-t border-sky-300">
+              <p className="text-sm font-semibold text-sky-700 mb-2">
+                📅 Customer's Required Schedule:
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Date:</span>{" "}
+                  {new Date(assignment.appointment_data.date).toLocaleDateString("en-US", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric"
+                  })}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Time:</span>{" "}
+                  {assignment.appointment_data.start_time} - {assignment.appointment_data.end_time}
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {/* Display Customer's Required Date and Time for Regular Service Requests */}
+          {!assignment.appointment_data && assignment.scheduled_date && (
+            <div className="mt-3 pt-3 border-t border-sky-300">
+              <p className="text-sm font-semibold text-sky-700 mb-2">
+                📅 Customer's Required Schedule:
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Date:</span>{" "}
+                  {new Date(assignment.scheduled_date).toLocaleDateString("en-US", {
+                    weekday: "short",
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric"
+                  })}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Time:</span>{" "}
+                  {new Date(assignment.scheduled_date).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                  })}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
